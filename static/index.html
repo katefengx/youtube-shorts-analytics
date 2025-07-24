@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tailoring Your Shorts</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- HERO PAGE -->
+    <section class="page hero">
+      <div class="search-bar">
+        <input type="text" id="viral-input" readonly />
+        <button>&#128269;</button>
+      </div>
+      <div class="hero-content">
+        <h1>Youtube Shorts Analysis</h1>
+        <p class="subtitle">mapping out shorts posts to subscriber growth</p>
+        <img
+          src="https://via.placeholder.com/420x220?text=Collage+Placeholder"
+          alt="Shorts Collage"
+          class="collage"
+        />
+        <canvas id="lineChart"></canvas>
+      </div>
+    </section>
+
+    <!-- UPLOAD PAGE -->
+    <section class="page tutorial">
+      <h2>How it works</h2>
+      <div class="tutorial-videos-container">
+        <div class="tutorial-videos-row">
+          <div class="tutorial-video-block">
+            <div class="video-title">How to find your YouTube Channel ID</div>
+            <div class="video-embed">
+              <iframe
+                width="100%"
+                height="270"
+                src="https://www.youtube.com/embed/0mTcdWyrBA8"
+                title="How to find your YouTube Channel ID"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+            <div class="video-caption">
+              Step 1: Locate your Channel ID for use in the analysis tool
+            </div>
+          </div>
+          <div class="tutorial-video-block">
+            <div class="video-title">Download your subscriber CSV</div>
+            <div class="video-embed">
+              <iframe
+                width="100%"
+                height="270"
+                src="https://www.youtube.com/embed/mpJEae2C1BY"
+                title="Download your subscriber CSV"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+            <div class="video-caption">
+              Step 2: Export your subscriber data from YouTube Analytics
+            </div>
+          </div>
+        </div>
+        <div class="tutorial-note">
+          <span aria-label="tip" role="img" style="font-size: 1.5em">💡</span>
+          Tip: When exporting your subscriber data, choose a time frame of at
+          least 30 days that includes dates when you posted Shorts.
+        </div>
+      </div>
+    </section>
+
+    <!-- INPUT SECTION -->
+    <section class="page input-section">
+      <h2>Analyze Your Channel</h2>
+      <p class="input-subtext">
+        Enter your YouTube channel ID and upload your analytics data
+      </p>
+
+      <div class="input-container">
+        <div class="input-panel">
+          <div class="input-group">
+            <label for="channel-id">YouTube Channel ID</label>
+            <input
+              type="text"
+              id="channel-id"
+              placeholder="e.g., UCeofpjuRJcm-FGwHt3u469Q"
+              class="channel-input"
+            />
+            <small class="help-text">
+              Find your Youtube channel ID (step 1)
+            </small>
+          </div>
+
+          <div class="input-group">
+            <label for="analytics-csv">Analytics CSV File</label>
+            <input
+              type="file"
+              id="analytics-csv"
+              accept=".csv"
+              class="csv-input"
+            />
+            <small class="help-text">
+              Upload the Totals.csv file from Youtube Analytics (step 2)
+            </small>
+          </div>
+
+          <button id="analyze-btn" class="analyze-button">
+            <span class="btn-text">Analyze Channel</span>
+            <span class="btn-loading" style="display: none">Processing...</span>
+          </button>
+        </div>
+
+        <div class="info-panel">
+          <h3>What you'll get:</h3>
+          <ul>
+            <li>📊 Subscriber growth timeline</li>
+            <li>🎯 Shorts performance analysis</li>
+            <li>📈 Peak detection and attribution</li>
+            <li>🎨 Visual insights and patterns</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="analysis-progress" style="display: none">
+        <div class="progress-steps">
+          <div class="step active" data-step="1">
+            <div class="step-number">1</div>
+            <div class="step-text">Fetching videos</div>
+          </div>
+          <div class="step" data-step="2">
+            <div class="step-number">2</div>
+            <div class="step-text">Processing data</div>
+          </div>
+          <div class="step" data-step="3">
+            <div class="step-number">3</div>
+            <div class="step-text">Generating insights</div>
+          </div>
+        </div>
+        <div class="progress-bar-analysis">
+          <div class="progress-fill-analysis" id="progress-fill-analysis"></div>
+        </div>
+        <p id="analysis-status" class="analysis-status">Starting analysis...</p>
+      </div>
+    </section>
+
+    <!-- ANALYSIS PAGE -->
+    <section class="page analytics" id="analytics-section">
+      <div id="analytics-lock-overlay">
+        Please complete the upload and analysis above to unlock this section.
+      </div>
+      <h2>Shorts & Subscriber Spikes</h2>
+      <p class="chart-subtext">
+        Hover over the line for subscriber counts by day<br />
+        Circle markers include recent Shorts information for that subscriber
+        spike
+      </p>
+
+      <!-- Time‐series SVG -->
+      <svg id="time-series"></svg>
+      <div id="tooltip" class="tooltip"></div>
+    </section>
+
+    <section class="page dashboard">
+      <div id="dashboard-root"></div>
+      <script
+        type="module"
+        src="/static/dashboard/assets/index-9_sxcfan.js"
+      ></script>
+    </section>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
