@@ -1,1 +1,1 @@
-# yt-shorts-analytics
+# youtube-shorts-analytics
