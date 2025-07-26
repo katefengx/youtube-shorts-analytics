@@ -564,6 +564,7 @@ def get_dashboard_data():
             },
             'emoji_stats': {
                 'usage_percentage': round(emoji_usage_percentage, 1),
+                'non_usage_percentage': round(100 - emoji_usage_percentage, 1),
                 'avg_emojis_per_video': round(avg_emojis_per_video, 1)
             },
             'top_shorts': top_shorts,

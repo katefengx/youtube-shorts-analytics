@@ -218,7 +218,10 @@ const ShortsDashboard: React.FC = () => {
             )}
           </div>
           <DonutChart
-            value={filteredData.hashtag_stats.usage_percentage}
+            usage_percentage={filteredData.hashtag_stats.usage_percentage}
+            non_usage_percentage={
+              filteredData.hashtag_stats.non_usage_percentage
+            }
             label={`USE`}
             icon={<span>#</span>}
             title="hashtags"
@@ -226,7 +229,8 @@ const ShortsDashboard: React.FC = () => {
             onFilterChange={handleFilterChange}
           />
           <DonutChart
-            value={filteredData.emoji_stats.usage_percentage}
+            usage_percentage={filteredData.emoji_stats.usage_percentage}
+            non_usage_percentage={filteredData.emoji_stats.non_usage_percentage}
             label={`USE`}
             icon={<span>😀</span>}
             title="emojis"

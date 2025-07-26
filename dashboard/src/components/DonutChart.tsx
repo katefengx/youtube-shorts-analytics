@@ -3,7 +3,8 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import "./DonutChart.css";
 
 type DonutChartProps = {
-  value: number;
+  usage_percentage: number;
+  non_usage_percentage: number;
   label: string;
   icon: React.ReactNode;
   description: string;
@@ -13,7 +14,8 @@ type DonutChartProps = {
 };
 
 const DonutChart: React.FC<DonutChartProps> = ({
-  value,
+  usage_percentage,
+  non_usage_percentage,
   label,
   icon,
   description,
@@ -22,8 +24,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
   onFilterChange,
 }) => {
   const data = [
-    { name: "use", value },
-    { name: "do not use", value: 100 - value },
+    { name: "use", value: usage_percentage },
+    { name: "do not use", value: non_usage_percentage },
   ];
   return (
     <div className="donut-chart_container">
@@ -64,7 +66,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
         <div className="donut-chart_text">{label}</div>
       </div>
       <div className="donut-chart_breakdown">
-        {value}% use {title} • {100 - value}% don't use {title}
+        {usage_percentage}% use {title} • {non_usage_percentage}% don't use{" "}
+        {title}
       </div>
       <div className="donut-chart_description">{description}</div>
     </div>

@@ -34,10 +34,12 @@ export interface DashboardData {
   };
   hashtag_stats: {
     usage_percentage: number;
+    non_usage_percentage: number;
     avg_hashtags_per_video: number;
   };
   emoji_stats: {
     usage_percentage: number;
+    non_usage_percentage: number;
     avg_emojis_per_video: number;
   };
   top_shorts: Array<{
