@@ -33,15 +33,10 @@
           <div class="tutorial-video-block">
             <div class="video-title">How to find your YouTube Channel ID</div>
             <div class="video-embed">
-              <iframe
-                width="100%"
-                height="270"
-                src="https://www.youtube.com/embed/0mTcdWyrBA8"
-                title="How to find your YouTube Channel ID"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
+              <video width="100%" height="270" controls preload="metadata">
+                <source src="assets/channel_id_tutorial.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
             </div>
             <div class="video-caption">
               Step 1: Locate your Channel ID for use in the analysis tool
@@ -50,15 +45,13 @@
           <div class="tutorial-video-block">
             <div class="video-title">Download your subscriber CSV</div>
             <div class="video-embed">
-              <iframe
-                width="100%"
-                height="270"
-                src="https://www.youtube.com/embed/mpJEae2C1BY"
-                title="Download your subscriber CSV"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
+              <video width="100%" height="270" controls preload="metadata">
+                <source
+                  src="assets/download_csv_tutorial.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>
             </div>
             <div class="video-caption">
               Step 2: Export your subscriber data from YouTube Analytics
@@ -108,7 +101,7 @@
             </small>
           </div>
 
-          <button id="analyze-btn" class="analyze-button">
+          <button id="analyze-btn" class="analyze-button" type="button">
             <span class="btn-text">Analyze Channel</span>
             <span class="btn-loading" style="display: none">Processing...</span>
           </button>
@@ -166,11 +159,132 @@
 
     <section class="page dashboard">
       <div id="dashboard-root"></div>
-      <script
-        type="module"
-        src="/static/dashboard/assets/index-9_sxcfan.js"
-      ></script>
+      <script>
+        // Ensure React app only loads once
+        (function () {
+          // Check if React root already exists
+          if (
+            window.reactRootCreated ||
+            document.getElementById("dashboard-root").children.length > 0
+          ) {
+            return;
+          }
+
+          // Check if script is already loaded
+          const existingScript = document.querySelector(
+            'script[src*="index-CjQsnqzr.js"]',
+          );
+          if (existingScript) {
+            return;
+          }
+
+          // Check if CSS is already loaded
+          const existingCSS = document.querySelector(
+            'link[href*="index-DybEUc4h.css"]',
+          );
+          if (!existingCSS) {
+            // Load CSS first
+            const cssLink = document.createElement("link");
+            cssLink.rel = "stylesheet";
+            cssLink.href = "/static/dashboard/assets/index-DybEUc4h.css";
+            document.head.appendChild(cssLink);
+          }
+
+          // Mark as created before loading to prevent race conditions
+          window.reactRootCreated = true;
+
+          const script = document.createElement("script");
+          script.type = "module";
+          script.src = "/static/dashboard/assets/index-CjQsnqzr.js";
+          script.id = "react-dashboard-script";
+
+          script.onerror = function () {
+            console.error("Failed to load React dashboard script");
+            window.reactRootCreated = false;
+            script.remove();
+          };
+
+          script.onload = function () {
+            console.log("React dashboard script loaded successfully");
+          };
+
+          document.head.appendChild(script);
+        })();
+      </script>
     </section>
+
+    <script>
+      // Clean up any existing React roots on page load
+      (function () {
+        const dashboardRoot = document.getElementById("dashboard-root");
+        if (dashboardRoot) {
+          // Clear any existing content
+          dashboardRoot.innerHTML = "";
+          // Reset the flag
+          window.reactRootCreated = false;
+        }
+      })();
+    </script>
+
+    <script>
+      // Handle React error #299 (multiple roots) and other common errors
+      window.addEventListener(
+        "error",
+        function (e) {
+          // Handle React error #299
+          if (e.message && e.message.includes("Minified React error #299")) {
+            e.preventDefault();
+            console.warn(
+              "React error #299 suppressed - multiple root creation prevented. This usually means the React app is trying to create multiple roots.",
+            );
+            // Clean up any duplicate roots
+            const dashboardRoot = document.getElementById("dashboard-root");
+            if (dashboardRoot && dashboardRoot.children.length > 1) {
+              console.warn("Cleaning up duplicate React roots");
+              // Keep only the first child (the original root)
+              while (dashboardRoot.children.length > 1) {
+                dashboardRoot.removeChild(dashboardRoot.lastChild);
+              }
+            }
+            return false;
+          }
+
+          // Handle other common errors
+          if (e.message && e.message.includes("runtime.lastError")) {
+            e.preventDefault();
+            return false;
+          }
+
+          // Suppress blocked resource errors from ad blockers
+          if (
+            e.target &&
+            e.target.src &&
+            e.target.src.includes("googleads.g.doubleclick.net")
+          ) {
+            e.preventDefault();
+            return false;
+          }
+        },
+        true,
+      );
+
+      // Handle unhandled promise rejections
+      window.addEventListener(
+        "unhandledrejection",
+        function (e) {
+          if (
+            e.reason &&
+            typeof e.reason === "string" &&
+            e.reason.includes("Minified React error #299")
+          ) {
+            e.preventDefault();
+            console.warn("React error #299 promise rejection suppressed");
+            return false;
+          }
+        },
+        true,
+      );
+    </script>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="script.js"></script>

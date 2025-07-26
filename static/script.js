@@ -234,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("csvFile", csvFile);
 
     // Make API call to backend
-    fetch("http://127.0.0.1:5000/api/analyze", {
+    fetch("/api/analyze", {
       method: "POST",
       body: formData,
     })
@@ -243,12 +243,23 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
           return JSON.parse(text);
         } catch (e) {
-          throw new Error("Invalid JSON: " + text);
+          throw new Error("Invalid JSON: " + text.substring(0, 200));
         }
       })
       .then((data) => {
         setStep(3);
         statusText.textContent = "Analysis complete!";
+
+        // Check if we have an error response
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // Check if we have valid data
+        if (!data || !data.data || !data.data.summary) {
+          throw new Error("Invalid response format from server");
+        }
+
         // Display results
         const summary = data.data.summary;
         const resultsHtml = `
@@ -578,7 +589,10 @@ function drawSubsTimeSeriesResponsive(
 
   svg.on("mouseleave", removeThumbnailGroup);
   svg.on("mousedown", removeThumbnailGroup);
-  svg.on("touchstart", removeThumbnailGroup);
+  // Use native event listener with passive flag for touchstart
+  svg
+    .node()
+    .addEventListener("touchstart", removeThumbnailGroup, { passive: true });
 
   const dataMin = d3.min(subsData, (d) => d.Date).getTime();
   const dataMax = d3.max(subsData, (d) => d.Date).getTime();
@@ -746,17 +760,22 @@ function drawSubsTimeSeriesResponsive(
     requestAnimationFrame(smoothScroll);
   }
 
-  svg.on("wheel", function (event) {
-    removeThumbnailGroup();
-    lineTooltip.style("opacity", 0);
-    event.preventDefault();
-    scrollVelocity += -event.deltaY * 0.3;
-    focus.style("display", "none");
-    if (!isScrolling) {
-      isScrolling = true;
-      requestAnimationFrame(smoothScroll);
-    }
-  });
+  // Use native event listener for wheel to control passive behavior
+  svg.node().addEventListener(
+    "wheel",
+    function (event) {
+      removeThumbnailGroup();
+      lineTooltip.style("opacity", 0);
+      event.preventDefault();
+      scrollVelocity += -event.deltaY * 0.3;
+      focus.style("display", "none");
+      if (!isScrolling) {
+        isScrolling = true;
+        requestAnimationFrame(smoothScroll);
+      }
+    },
+    { passive: false },
+  ); // passive: false because we need preventDefault()
 
   svg.on("mouseleave", function () {
     lineTooltip.style("opacity", 0);

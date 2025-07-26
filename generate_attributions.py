@@ -9,6 +9,15 @@ if len(sys.argv) != 4:
 
 peaks = pd.read_csv(sys.argv[1], parse_dates=["date"])
 shorts = pd.read_csv(sys.argv[2], parse_dates=["date"])
+
+# Check if there's any overlap
+if peaks["date"].max() < shorts["date"].min() or peaks["date"].min() > shorts["date"].max():
+    # Create an empty file with an error message
+    with open(sys.argv[3], 'w') as f:
+        f.write("error,message\n")
+        f.write("no_overlap,No date overlap between subscriber peaks and shorts data. Please ensure the uploaded CSV file matches the channel ID.\n")
+    sys.exit(0)
+
 LOOKBACK_DAYS = 7
 top_k = 3
 attrib_rows = []
@@ -30,5 +39,11 @@ for _, peak in peaks.iterrows():
             "likes": vid.get("like_count", 0),
             "comments": vid.get("comment_count", 0),
         })
-attrib_df = pd.DataFrame(attrib_rows)
-attrib_df.to_csv(sys.argv[3], index=False) 
+
+if not attrib_rows:
+    with open(sys.argv[3], 'w') as f:
+        f.write("error,message\n")
+        f.write("no_attributions,No attributions found. The subscriber peaks may not align with the shorts data.\n")
+else:
+    attrib_df = pd.DataFrame(attrib_rows)
+    attrib_df.to_csv(sys.argv[3], index=False) 

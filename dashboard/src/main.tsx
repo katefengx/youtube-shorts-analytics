@@ -1,28 +1,53 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import "./index.css";
+import "./App.css";
 
-// Find the dashboard root
-const dashboardRoot = document.getElementById("dashboard-root");
-if (dashboardRoot) {
-  // Attach a shadow root
-  const shadow = dashboardRoot.attachShadow({ mode: "open" });
+// Extend Window interface
+declare global {
+  interface Window {
+    reactRootCreated?: boolean;
+  }
+  interface HTMLElement {
+    _reactRootContainer?: any;
+  }
+}
 
-  // Create a container for React to render into
-  const reactRoot = document.createElement("div");
-  shadow.appendChild(reactRoot);
+// Prevent multiple React root creation
+console.log("main.tsx: Starting React app initialization...");
+if (!window.reactRootCreated) {
+  console.log("main.tsx: Creating React root...");
+  window.reactRootCreated = true;
 
-  // Inject your CSS into the shadow root
-  const style = document.createElement("style");
-  style.textContent = `
-    @import url('/static/dashboard/assets/index-D8b4DHJx.css');
-  `;
-  shadow.appendChild(style);
+  // Find the dashboard root - try both possible IDs
+  let dashboardRoot = document.getElementById("dashboard-root");
+  if (!dashboardRoot) {
+    dashboardRoot = document.getElementById("root");
+  }
+  if (dashboardRoot) {
+    try {
+      // Check if React is already rendered in this element
+      if (dashboardRoot._reactRootContainer) {
+        console.warn("React root already exists, skipping initialization");
+      } else {
+        // Clear any existing content
+        dashboardRoot.innerHTML = "";
 
-  // Render your app inside the shadow root
-  ReactDOM.createRoot(reactRoot).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>,
-  );
+        // Create React root
+        console.log("main.tsx: Creating React root for dashboard...");
+        const root = ReactDOM.createRoot(dashboardRoot);
+        root.render(
+          <React.StrictMode>
+            <App />
+          </React.StrictMode>,
+        );
+        console.log("main.tsx: React app rendered successfully");
+      }
+    } catch (error) {
+      console.error("Error initializing React app:", error);
+      // Reset the flag if initialization fails
+      window.reactRootCreated = false;
+    }
+  }
 }
