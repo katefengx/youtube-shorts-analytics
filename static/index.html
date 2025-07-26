@@ -25,53 +25,21 @@
       </div>
     </section>
 
-    <!-- UPLOAD PAGE -->
-    <section class="page tutorial">
-      <h2>How it works</h2>
-      <div class="tutorial-videos-container">
-        <div class="tutorial-videos-row">
-          <div class="tutorial-video-block">
-            <div class="video-title">How to find your YouTube Channel ID</div>
-            <div class="video-embed">
-              <video width="100%" height="270" controls preload="metadata">
-                <source src="assets/channel_id_tutorial.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            <div class="video-caption">
-              Step 1: Locate your Channel ID for use in the analysis tool
-            </div>
-          </div>
-          <div class="tutorial-video-block">
-            <div class="video-title">Download your subscriber CSV</div>
-            <div class="video-embed">
-              <video width="100%" height="270" controls preload="metadata">
-                <source
-                  src="assets/download_csv_tutorial.mp4"
-                  type="video/mp4"
-                />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            <div class="video-caption">
-              Step 2: Export your subscriber data from YouTube Analytics
-            </div>
-          </div>
+    <!-- CHANNEL ID SECTION -->
+    <section class="page channel-id-section">
+      <h2>Step 1: Find Your YouTube Channel ID</h2>
+      <div class="tutorial-video-block">
+        <div class="video-title">How to find your YouTube Channel ID</div>
+        <div class="video-embed">
+          <video width="100%" height="270" controls preload="metadata">
+            <source src="assets/channel_id_tutorial.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
-        <div class="tutorial-note">
-          <span aria-label="tip" role="img" style="font-size: 1.5em">💡</span>
-          Tip: When exporting your subscriber data, choose a time frame of at
-          least 30 days that includes dates when you posted Shorts.
+        <div class="video-caption">
+          Step 1: Locate your Channel ID for use in the analysis tool
         </div>
       </div>
-    </section>
-
-    <!-- INPUT SECTION -->
-    <section class="page input-section">
-      <h2>Analyze Your Channel</h2>
-      <p class="input-subtext">
-        Enter your YouTube channel ID and upload your analytics data
-      </p>
 
       <div class="input-container">
         <div class="input-panel">
@@ -85,19 +53,6 @@
             />
             <small class="help-text">
               Find your Youtube channel ID (step 1)
-            </small>
-          </div>
-
-          <div class="input-group">
-            <label for="analytics-csv">Analytics CSV File</label>
-            <input
-              type="file"
-              id="analytics-csv"
-              accept=".csv"
-              class="csv-input"
-            />
-            <small class="help-text">
-              Upload the Totals.csv file from Youtube Analytics (step 2)
             </small>
           </div>
 
@@ -140,28 +95,15 @@
       </div>
     </section>
 
-    <!-- ANALYSIS PAGE -->
-    <section class="page analytics" id="analytics-section">
-      <div id="analytics-lock-overlay">
-        Please complete the upload and analysis above to unlock this section.
+    <!-- DASHBOARD SECTION -->
+    <section class="page dashboard" id="dashboard-section">
+      <div id="dashboard-lock-overlay">
+        Please complete the channel analysis above to unlock this section.
       </div>
-      <h2>Shorts & Subscriber Spikes</h2>
-      <p class="chart-subtext">
-        Hover over the line for subscriber counts by day<br />
-        Circle markers include recent Shorts information for that subscriber
-        spike
-      </p>
-
-      <!-- Time‐series SVG -->
-      <svg id="time-series"></svg>
-      <div id="tooltip" class="tooltip"></div>
-    </section>
-
-    <section class="page dashboard">
       <div id="dashboard-root"></div>
       <script>
-        // Ensure React app only loads once
-        (function () {
+        // React dashboard will be loaded when the section is unlocked
+        window.loadDashboard = function () {
           // Check if React root already exists
           if (
             window.reactRootCreated ||
@@ -172,7 +114,7 @@
 
           // Check if script is already loaded
           const existingScript = document.querySelector(
-            'script[src*="index-CjQsnqzr.js"]',
+            'script[src*="index-CEPg0t7F.js"]',
           );
           if (existingScript) {
             return;
@@ -195,7 +137,7 @@
 
           const script = document.createElement("script");
           script.type = "module";
-          script.src = "/static/dashboard/assets/index-CjQsnqzr.js";
+          script.src = "/static/dashboard/assets/index-CEPg0t7F.js";
           script.id = "react-dashboard-script";
 
           script.onerror = function () {
@@ -205,12 +147,88 @@
           };
 
           script.onload = function () {
-            console.log("React dashboard script loaded successfully");
+            // React dashboard script loaded successfully
           };
 
           document.head.appendChild(script);
-        })();
+        };
       </script>
+    </section>
+
+    <!-- CSV UPLOAD SECTION -->
+    <section class="page csv-upload-section" id="csv-upload-section">
+      <div id="csv-lock-overlay">
+        Please complete the channel analysis above to unlock this section.
+      </div>
+      <h2>Step 2: Upload Your Subscriber Data</h2>
+      <div class="tutorial-video-block">
+        <div class="video-title">Download your subscriber CSV</div>
+        <div class="video-embed">
+          <video width="100%" height="270" controls preload="metadata">
+            <source src="assets/download_csv_tutorial.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="video-caption">
+          Step 2: Export your subscriber data from YouTube Analytics
+        </div>
+      </div>
+
+      <div class="tutorial-note">
+        <span aria-label="tip" role="img" style="font-size: 1.5em">💡</span>
+        Tip: When exporting your subscriber data, choose a time frame of at
+        least 30 days that includes dates when you posted Shorts.
+      </div>
+
+      <div class="input-container">
+        <div class="input-panel">
+          <div class="input-group">
+            <label for="analytics-csv">Analytics CSV File</label>
+            <input
+              type="file"
+              id="analytics-csv"
+              accept=".csv"
+              class="csv-input"
+            />
+            <small class="help-text">
+              Upload the Totals.csv file from Youtube Analytics (step 2)
+            </small>
+          </div>
+
+          <button id="upload-csv-btn" class="analyze-button" type="button">
+            <span class="btn-text">Upload CSV</span>
+            <span class="btn-loading" style="display: none">Processing...</span>
+          </button>
+        </div>
+
+        <div class="info-panel">
+          <h3>What this unlocks:</h3>
+          <ul>
+            <li>📈 Subscriber spike detection</li>
+            <li>🎯 Shorts attribution analysis</li>
+            <li>📊 Peak-to-video mapping</li>
+            <li>🔍 Detailed correlation insights</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANALYSIS PAGE -->
+    <section class="page analytics" id="analytics-section">
+      <div id="analytics-lock-overlay">
+        Please complete both the channel analysis and CSV upload above to unlock
+        this section.
+      </div>
+      <h2>Shorts & Subscriber Spikes</h2>
+      <p class="chart-subtext">
+        Hover over the line for subscriber counts by day<br />
+        Circle markers include recent Shorts information for that subscriber
+        spike
+      </p>
+
+      <!-- Time‐series SVG -->
+      <svg id="time-series"></svg>
+      <div id="tooltip" class="tooltip"></div>
     </section>
 
     <script>

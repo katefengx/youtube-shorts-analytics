@@ -217,14 +217,22 @@ def analyze_channel():
             print(f"DEBUG: API MODE - csv_file: {csv_file}")
             print(f"DEBUG: API MODE - csv_file.filename: {csv_file.filename if csv_file else 'None'}")
             
-            if not channel_id or not csv_file:
-                return jsonify({'error': 'Channel ID and CSV file are required.'}), 400
+            if not channel_id:
+                return jsonify({'error': 'Channel ID is required.'}), 400
             if not re.match(r'^UC[\w-]{22}$', channel_id):
                 return jsonify({'error': 'Invalid channel ID format.'}), 400
             
             with tempfile.TemporaryDirectory() as tmpdir:
-                csv_path = os.path.join(tmpdir, 'stats.csv')
-                csv_file.save(csv_path)
+                # Check if this is a dummy CSV file (channel-only analysis)
+                is_channel_only = not csv_file or csv_file.filename == 'dummy.csv'
+                
+                if not is_channel_only:
+                    # Full analysis with CSV
+                    if not csv_file:
+                        return jsonify({'error': 'CSV file is required for full analysis.'}), 400
+                    
+                    csv_path = os.path.join(tmpdir, 'stats.csv')
+                    csv_file.save(csv_path)
                 url = "https://www.googleapis.com/youtube/v3/channels"
                 params = {
                     'part': 'contentDetails',
@@ -244,12 +252,9 @@ def analyze_channel():
                 shorts_path = os.path.join(tmpdir, 'shorts.csv')
                 pd.DataFrame(shorts).to_csv(shorts_path, index=False)
                 
-                # --- Run new scripts ---
-                sub_peaks_path = os.path.join(tmpdir, 'sub_peaks.csv')
-                attributions_path = os.path.join(tmpdir, 'attributions.csv')
-                shorts_by_day_path = os.path.join(tmpdir, 'shorts_by_day.csv')
-                # 1. Generate sub_peaks.csv
+                # Process analytics data
                 processed = process_analytics_data(shorts_path)
+                
                 # Save processed shorts_data as CSV for downstream scripts
                 processed_shorts_path = os.path.join(tmpdir, 'processed_shorts.csv')
                 pd.DataFrame(processed['shorts_data'])[
@@ -262,67 +267,84 @@ def analyze_channel():
                     ]
                 ].to_csv(processed_shorts_path, index=False)
                 shutil.copy(processed_shorts_path, 'data/processed_shorts.csv')
-                # Use processed_shorts_path for downstream scripts
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                try:
-                    result = subprocess.run([sys.executable, os.path.join(script_dir, 'generate_sub_peaks.py'), csv_path, sub_peaks_path], 
-                                          check=True, capture_output=True, text=True, cwd=script_dir)
-                except subprocess.CalledProcessError as e:
-                    print(f"DEBUG: generate_sub_peaks.py failed with error: {e}")
-                    print(f"DEBUG: stdout: {e.stdout}")
-                    print(f"DEBUG: stderr: {e.stderr}")
-                    raise
                 
-                try:
-                                    result = subprocess.run([sys.executable, os.path.join(script_dir, 'generate_attributions.py'), sub_peaks_path, processed_shorts_path, attributions_path], 
-                                      check=True, capture_output=True, text=True, cwd=script_dir)
-                except subprocess.CalledProcessError as e:
-                    print(f"DEBUG: generate_attributions.py failed with error: {e}")
-                    print(f"DEBUG: stdout: {e.stdout}")
-                    print(f"DEBUG: stderr: {e.stderr}")
-                    raise
-                
-                try:
-                    result = subprocess.run([sys.executable, os.path.join(script_dir, 'generate_shorts_by_day.py'), processed_shorts_path, shorts_by_day_path], 
-                                          check=True, capture_output=True, text=True, cwd=script_dir)
-                except subprocess.CalledProcessError as e:
-                    print(f"DEBUG: generate_shorts_by_day.py failed with error: {e}")
-                    print(f"DEBUG: stdout: {e.stdout}")
-                    print(f"DEBUG: stderr: {e.stderr}")
-                    raise
-                # Load outputs
-                sub_peaks_df = pd.read_csv(sub_peaks_path)
-                
-                # Check if attributions file contains an error message
-                try:
-                    attributions_df = pd.read_csv(attributions_path)
-                    if 'error' in attributions_df.columns and 'message' in attributions_df.columns:
-                        error_row = attributions_df.iloc[0]
-                        if error_row['error'] == 'no_overlap':
-                            return jsonify({'error': 'No date overlap between subscriber peaks and shorts data. Please ensure the uploaded CSV file matches the channel ID.'}), 400
-                        elif error_row['error'] == 'no_attributions':
-                            return jsonify({'error': 'No attributions found. The subscriber peaks may not align with the shorts data.'}), 400
-                except Exception as e:
-                    return jsonify({'error': 'Failed to process attributions data.'}), 500
-                
-                shorts_by_day_df = pd.read_csv(shorts_by_day_path)
-                sub_stats_df = pd.read_csv(csv_path)
-                # Convert to records
-                sub_peaks = sub_peaks_df.to_dict('records')
-                attributions = attributions_df.to_dict('records')
-                shorts_by_day = shorts_by_day_df.to_dict('records')
-                sub_stats = sub_stats_df.to_dict('records')
-                
-                response_data = {
-                    'success': True,
-                    'data': processed,
-                    'sub_peaks': sub_peaks,
-                    'attributions': attributions,
-                    'shorts_by_day': shorts_by_day,
-                    'sub_stats': sub_stats,
-                    'message': 'Analysis completed successfully'
-                }
-                return jsonify(response_data)
+                if is_channel_only:
+                    # Channel-only analysis - return just the processed data
+                    response_data = {
+                        'success': True,
+                        'data': processed,
+                        'message': 'Channel analysis completed successfully'
+                    }
+                    return jsonify(response_data)
+                else:
+                    # Full analysis with CSV
+                    sub_peaks_path = os.path.join(tmpdir, 'sub_peaks.csv')
+                    attributions_path = os.path.join(tmpdir, 'attributions.csv')
+                    shorts_by_day_path = os.path.join(tmpdir, 'shorts_by_day.csv')
+                    
+                    # Run analysis scripts
+                    script_dir = os.path.dirname(os.path.abspath(__file__))
+                    try:
+                        result = subprocess.run([sys.executable, os.path.join(script_dir, 'generate_sub_peaks.py'), csv_path, sub_peaks_path], 
+                                              check=True, capture_output=True, text=True, cwd=script_dir)
+                    except subprocess.CalledProcessError as e:
+                        print(f"DEBUG: generate_sub_peaks.py failed with error: {e}")
+                        print(f"DEBUG: stdout: {e.stdout}")
+                        print(f"DEBUG: stderr: {e.stderr}")
+                        raise
+                    
+                    try:
+                        result = subprocess.run([sys.executable, os.path.join(script_dir, 'generate_attributions.py'), sub_peaks_path, processed_shorts_path, attributions_path], 
+                                              check=True, capture_output=True, text=True, cwd=script_dir)
+                    except subprocess.CalledProcessError as e:
+                        print(f"DEBUG: generate_attributions.py failed with error: {e}")
+                        print(f"DEBUG: stdout: {e.stdout}")
+                        print(f"DEBUG: stderr: {e.stderr}")
+                        raise
+                    
+                    try:
+                        result = subprocess.run([sys.executable, os.path.join(script_dir, 'generate_shorts_by_day.py'), processed_shorts_path, shorts_by_day_path], 
+                                              check=True, capture_output=True, text=True, cwd=script_dir)
+                    except subprocess.CalledProcessError as e:
+                        print(f"DEBUG: generate_shorts_by_day.py failed with error: {e}")
+                        print(f"DEBUG: stdout: {e.stdout}")
+                        print(f"DEBUG: stderr: {e.stderr}")
+                        raise
+                    
+                    # Load outputs
+                    sub_peaks_df = pd.read_csv(sub_peaks_path)
+                    
+                    # Check if attributions file contains an error message
+                    try:
+                        attributions_df = pd.read_csv(attributions_path)
+                        if 'error' in attributions_df.columns and 'message' in attributions_df.columns:
+                            error_row = attributions_df.iloc[0]
+                            if error_row['error'] == 'no_overlap':
+                                return jsonify({'error': 'No date overlap between subscriber peaks and shorts data. Please ensure the uploaded CSV file matches the channel ID.'}), 400
+                            elif error_row['error'] == 'no_attributions':
+                                return jsonify({'error': 'No attributions found. The subscriber peaks may not align with the shorts data.'}), 400
+                    except Exception as e:
+                        return jsonify({'error': 'Failed to process attributions data.'}), 500
+                    
+                    shorts_by_day_df = pd.read_csv(shorts_by_day_path)
+                    sub_stats_df = pd.read_csv(csv_path)
+                    
+                    # Convert to records
+                    sub_peaks = sub_peaks_df.to_dict('records')
+                    attributions = attributions_df.to_dict('records')
+                    shorts_by_day = shorts_by_day_df.to_dict('records')
+                    sub_stats = sub_stats_df.to_dict('records')
+                    
+                    response_data = {
+                        'success': True,
+                        'data': processed,
+                        'sub_peaks': sub_peaks,
+                        'attributions': attributions,
+                        'shorts_by_day': shorts_by_day,
+                        'sub_stats': sub_stats,
+                        'message': 'Analysis completed successfully'
+                    }
+                    return jsonify(response_data)
         
         elif MODE == 'CSV':
             # ===== CSV MODE =====
@@ -336,20 +358,6 @@ def analyze_channel():
                 return jsonify({'error': f'Mock API data file not found: {MOCK_API_DATA_PATH}'}), 404
             
             with tempfile.TemporaryDirectory() as tmpdir:
-                # Save the uploaded CSV file (subscriber analytics)
-                sub_stats_path = os.path.join(tmpdir, 'sub_stats.csv')
-                csv_file.save(sub_stats_path)
-                print(f"DEBUG: Saved uploaded subscriber stats to {sub_stats_path}")
-                
-                # Debug: Check if file exists and has content
-                if os.path.exists(sub_stats_path):
-                    print(f"DEBUG: File exists, size: {os.path.getsize(sub_stats_path)} bytes")
-                    with open(sub_stats_path, 'r') as f:
-                        first_lines = f.readlines()[:3]
-                        print(f"DEBUG: First few lines: {first_lines}")
-                else:
-                    print(f"DEBUG: File does not exist!")
-                
                 # Use mock API data as shorts data
                 shorts_path = os.path.join(tmpdir, 'shorts.csv')
                 mock_api_data = pd.read_csv(MOCK_API_DATA_PATH)
@@ -358,14 +366,6 @@ def analyze_channel():
                 
                 # Process the mock API data (shorts)
                 processed = process_analytics_data(shorts_path)
-                
-                # Convert uploaded subscriber data to the expected format
-                sub_stats = pd.read_csv(sub_stats_path).to_dict('records')
-                
-                # Run the analysis scripts
-                sub_peaks_path = os.path.join(tmpdir, 'sub_peaks.csv')
-                attributions_path = os.path.join(tmpdir, 'attributions.csv')
-                shorts_by_day_path = os.path.join(tmpdir, 'shorts_by_day.csv')
                 
                 # Save processed shorts_data as CSV for downstream scripts
                 processed_shorts_path = os.path.join(tmpdir, 'processed_shorts.csv')
@@ -380,52 +380,75 @@ def analyze_channel():
                 ].to_csv(processed_shorts_path, index=False)
                 shutil.copy(processed_shorts_path, 'data/processed_shorts.csv')
                 
-                # Run the analysis scripts
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                print(f"DEBUG: Running generate_sub_peaks.py with input: {sub_stats_path}")
-                try:
-                    result = subprocess.run([sys.executable, os.path.join(script_dir, 'generate_sub_peaks.py'), sub_stats_path, sub_peaks_path], 
-                                          check=True, capture_output=True, text=True, cwd=script_dir)
-                    print(f"DEBUG: generate_sub_peaks.py completed successfully")
-                except subprocess.CalledProcessError as e:
-                    print(f"DEBUG: generate_sub_peaks.py failed with error: {e}")
-                    print(f"DEBUG: stdout: {e.stdout}")
-                    print(f"DEBUG: stderr: {e.stderr}")
-                    raise
-                subprocess.run([sys.executable, os.path.join(script_dir, 'generate_attributions.py'), sub_peaks_path, processed_shorts_path, attributions_path], check=True, cwd=script_dir)
-                subprocess.run([sys.executable, os.path.join(script_dir, 'generate_shorts_by_day.py'), processed_shorts_path, shorts_by_day_path], check=True, cwd=script_dir)
-                
-                # Load outputs
-                sub_peaks_df = pd.read_csv(sub_peaks_path)
-                attributions_df = pd.read_csv(attributions_path)
-                shorts_by_day_df = pd.read_csv(shorts_by_day_path)
-                
-                # Convert to records
-                sub_peaks = sub_peaks_df.to_dict('records')
-                attributions = attributions_df.to_dict('records')
-                shorts_by_day = shorts_by_day_df.to_dict('records')
-                
-                # Debug logging
-                print("DEBUG: sub_peaks length:", len(sub_peaks))
-                print("DEBUG: attributions length:", len(attributions))
-                print("DEBUG: shorts_by_day length:", len(shorts_by_day))
-                print("DEBUG: sub_stats length:", len(sub_stats))
-                print("DEBUG: processed keys:", list(processed.keys()))
-                print("DEBUG: processed['shorts_data'] length:", len(processed.get('shorts_data', [])))
-                print("DEBUG: processed['daily_data'] length:", len(processed.get('daily_data', [])))
-                
-                response_data = {
-                    'success': True,
-                    'data': processed,
-                    'sub_peaks': sub_peaks,
-                    'attributions': attributions,
-                    'shorts_by_day': shorts_by_day,
-                    'sub_stats': sub_stats,
-                    'message': 'Analysis completed successfully (CSV mode)'
-                }
-                
-                print("DEBUG: CSV MODE - Response data keys:", list(response_data.keys()))
-                return jsonify(response_data)
+                if is_channel_only:
+                    # Channel-only analysis - return just the processed data
+                    response_data = {
+                        'success': True,
+                        'data': processed,
+                        'message': 'Channel analysis completed successfully (CSV mode)'
+                    }
+                    return jsonify(response_data)
+                else:
+                    # Full analysis with CSV
+                    # Save the uploaded CSV file (subscriber analytics)
+                    sub_stats_path = os.path.join(tmpdir, 'sub_stats.csv')
+                    csv_file.save(sub_stats_path)
+                    print(f"DEBUG: Saved uploaded subscriber stats to {sub_stats_path}")
+                    
+                    # Convert uploaded subscriber data to the expected format
+                    sub_stats = pd.read_csv(sub_stats_path).to_dict('records')
+                    
+                    # Run the analysis scripts
+                    sub_peaks_path = os.path.join(tmpdir, 'sub_peaks.csv')
+                    attributions_path = os.path.join(tmpdir, 'attributions.csv')
+                    shorts_by_day_path = os.path.join(tmpdir, 'shorts_by_day.csv')
+                    
+                    # Run the analysis scripts
+                    script_dir = os.path.dirname(os.path.abspath(__file__))
+                    print(f"DEBUG: Running generate_sub_peaks.py with input: {sub_stats_path}")
+                    try:
+                        result = subprocess.run([sys.executable, os.path.join(script_dir, 'generate_sub_peaks.py'), sub_stats_path, sub_peaks_path], 
+                                              check=True, capture_output=True, text=True, cwd=script_dir)
+                        print(f"DEBUG: generate_sub_peaks.py completed successfully")
+                    except subprocess.CalledProcessError as e:
+                        print(f"DEBUG: generate_sub_peaks.py failed with error: {e}")
+                        print(f"DEBUG: stdout: {e.stdout}")
+                        print(f"DEBUG: stderr: {e.stderr}")
+                        raise
+                    subprocess.run([sys.executable, os.path.join(script_dir, 'generate_attributions.py'), sub_peaks_path, processed_shorts_path, attributions_path], check=True, cwd=script_dir)
+                    subprocess.run([sys.executable, os.path.join(script_dir, 'generate_shorts_by_day.py'), processed_shorts_path, shorts_by_day_path], check=True, cwd=script_dir)
+                    
+                    # Load outputs
+                    sub_peaks_df = pd.read_csv(sub_peaks_path)
+                    attributions_df = pd.read_csv(attributions_path)
+                    shorts_by_day_df = pd.read_csv(shorts_by_day_path)
+                    
+                    # Convert to records
+                    sub_peaks = sub_peaks_df.to_dict('records')
+                    attributions = attributions_df.to_dict('records')
+                    shorts_by_day = shorts_by_day_df.to_dict('records')
+                    
+                    # Debug logging
+                    print("DEBUG: sub_peaks length:", len(sub_peaks))
+                    print("DEBUG: attributions length:", len(attributions))
+                    print("DEBUG: shorts_by_day length:", len(shorts_by_day))
+                    print("DEBUG: sub_stats length:", len(sub_stats))
+                    print("DEBUG: processed keys:", list(processed.keys()))
+                    print("DEBUG: processed['shorts_data'] length:", len(processed.get('shorts_data', [])))
+                    print("DEBUG: processed['daily_data'] length:", len(processed.get('daily_data', [])))
+                    
+                    response_data = {
+                        'success': True,
+                        'data': processed,
+                        'sub_peaks': sub_peaks,
+                        'attributions': attributions,
+                        'shorts_by_day': shorts_by_day,
+                        'sub_stats': sub_stats,
+                        'message': 'Analysis completed successfully (CSV mode)'
+                    }
+                    
+                    print("DEBUG: CSV MODE - Response data keys:", list(response_data.keys()))
+                    return jsonify(response_data)
         
         else:
             return jsonify({'error': f'Invalid mode: {MODE}. Use "API" or "CSV".'}), 400
@@ -447,6 +470,82 @@ def get_processed_shorts_data():
     data = df.to_dict('records')
     print(f"DEBUG: Returning {len(data)} records from processed_shorts.csv")
     return jsonify({'data': data})
+
+@app.route('/api/dashboard_data', methods=['GET'])
+def get_dashboard_data():
+    """Get processed dashboard data from processed_shorts.csv with calculated statistics."""
+    print("DEBUG: /api/dashboard_data endpoint called")
+    processed_shorts_path = 'data/processed_shorts.csv'
+    
+    if not os.path.exists(processed_shorts_path):
+        print("DEBUG: processed_shorts.csv not found")
+        return jsonify({'error': 'No processed shorts data available'}), 404
+    
+    try:
+        df = pd.read_csv(processed_shorts_path)
+        
+        # Calculate dashboard statistics
+        total_shorts = len(df)
+        avg_views = float(df['view_count'].mean())
+        avg_likes = float(df['like_count'].mean())
+        avg_comments = float(df['comment_count'].mean())
+        
+        # Hashtag statistics
+        shorts_with_hashtags = df[df['has_hashtags'] == True]
+        hashtag_usage_percentage = (len(shorts_with_hashtags) / total_shorts) * 100 if total_shorts > 0 else 0
+        avg_hashtags_per_video = float(shorts_with_hashtags['hashtag_count'].mean()) if len(shorts_with_hashtags) > 0 else 0
+        
+        # Emoji statistics
+        shorts_with_emojis = df[df['has_emojis'] == True]
+        emoji_usage_percentage = (len(shorts_with_emojis) / total_shorts) * 100 if total_shorts > 0 else 0
+        avg_emojis_per_video = float(shorts_with_emojis['emoji_count'].mean()) if len(shorts_with_emojis) > 0 else 0
+        
+        # Top performing shorts (by views)
+        top_shorts = df.nlargest(5, 'view_count')[['title', 'view_count', 'like_count', 'comment_count']].to_dict('records')
+        
+        # Prepare scatter plot data
+        scatter_data = {
+            'caps_vs_views': df[['caps_percentage', 'view_count']].dropna().to_dict('records'),
+            'length_vs_views': df[['title_length', 'view_count']].dropna().to_dict('records')
+        }
+        
+        # Format numbers for display
+        def format_number(num):
+            if num >= 1000000:
+                return f"{num/1000000:.1f}M"
+            elif num >= 1000:
+                return f"{num/1000:.1f}K"
+            else:
+                return f"{num:.0f}"
+        
+        dashboard_data = {
+            'summary': {
+                'total_shorts': total_shorts,
+                'avg_views': format_number(avg_views),
+                'avg_likes': format_number(avg_likes),
+                'avg_comments': format_number(avg_comments),
+                'avg_views_raw': avg_views,
+                'avg_likes_raw': avg_likes,
+                'avg_comments_raw': avg_comments
+            },
+            'hashtag_stats': {
+                'usage_percentage': round(hashtag_usage_percentage, 1),
+                'avg_hashtags_per_video': round(avg_hashtags_per_video, 1)
+            },
+            'emoji_stats': {
+                'usage_percentage': round(emoji_usage_percentage, 1),
+                'avg_emojis_per_video': round(avg_emojis_per_video, 1)
+            },
+            'top_shorts': top_shorts,
+            'scatter_data': scatter_data
+        }
+        
+        print(f"DEBUG: Returning dashboard data with {total_shorts} shorts")
+        return jsonify(dashboard_data)
+        
+    except Exception as e:
+        print(f"DEBUG: Error processing dashboard data: {str(e)}")
+        return jsonify({'error': f'Failed to process dashboard data: {str(e)}'}), 500
 
 @app.route('/dashboard')
 def serve_dashboard():

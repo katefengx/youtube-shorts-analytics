@@ -1,31 +1,45 @@
 import React, { useEffect, useState } from "react";
-import type { ShortData } from "./types";
+import type { DashboardData } from "./types";
 import "./ShortsDashboard.css";
 
 const ShortsDashboard: React.FC = () => {
-  const [shortsData, setShortsData] = useState<ShortData[]>([]);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     console.log("ShortsDashboard: Starting to fetch data...");
-    fetch("/api/shorts_data")
+
+    // Fetch dashboard data
+    fetch("/api/dashboard_data")
       .then((res) => {
-        console.log("ShortsDashboard: Response status:", res.status);
+        console.log("ShortsDashboard: Dashboard response status:", res.status);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
         return res.json();
       })
       .then((data) => {
-        console.log("ShortsDashboard: Received data:", data);
-        setShortsData(data.data || []);
+        console.log("ShortsDashboard: Received dashboard data:", data);
+        if (data.error) {
+          setError(data.error);
+        } else {
+          setDashboardData(data);
+        }
         setLoading(false);
       })
       .catch((err) => {
-        console.error("ShortsDashboard: Failed to fetch shorts data:", err);
+        console.error("ShortsDashboard: Failed to fetch dashboard data:", err);
+        setError(err.message);
         setLoading(false);
       });
   }, []);
 
   if (loading) return <div>Loading...</div>;
-  if (!shortsData.length) return <div>No data available.</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!dashboardData) return <div>No dashboard data available.</div>;
 
   return (
     <div className="dashboard-container">
@@ -41,17 +55,19 @@ const ShortsDashboard: React.FC = () => {
         <div className="summary-cards">
           <div className="card">
             <div className="card-title">AVG. VIEWS</div>
-            <div className="card-value">10.2K</div>
+            <div className="card-value">{dashboardData.summary.avg_views}</div>
             <div className="sparkline"></div>
           </div>
           <div className="card">
             <div className="card-title">AVG. LIKES</div>
-            <div className="card-value">5.3K</div>
+            <div className="card-value">{dashboardData.summary.avg_likes}</div>
             <div className="sparkline"></div>
           </div>
           <div className="card">
             <div className="card-title">AVG. COMMENTS</div>
-            <div className="card-value">2.3K</div>
+            <div className="card-value">
+              {dashboardData.summary.avg_comments}
+            </div>
             <div className="sparkline"></div>
           </div>
         </div>
@@ -64,19 +80,25 @@ const ShortsDashboard: React.FC = () => {
           <div className="donut-card">
             <div className="donut-chart">
               <div className="donut-icon">#</div>
-              <div className="donut-label">USE</div>
+              <div className="donut-label">
+                {dashboardData.hashtag_stats.usage_percentage}%
+              </div>
             </div>
             <div className="donut-description">
-              stats on shorts that have hashtags
+              {dashboardData.hashtag_stats.avg_hashtags_per_video} avg hashtags
+              per video
             </div>
           </div>
           <div className="donut-card">
             <div className="donut-chart">
               <div className="donut-icon">😀</div>
-              <div className="donut-label">USE</div>
+              <div className="donut-label">
+                {dashboardData.emoji_stats.usage_percentage}%
+              </div>
             </div>
             <div className="donut-description">
-              average number of hashtags for hashtag videos
+              {dashboardData.emoji_stats.avg_emojis_per_video} avg emojis per
+              video
             </div>
           </div>
         </div>
@@ -91,35 +113,29 @@ const ShortsDashboard: React.FC = () => {
               <div className="scatter-axis x"></div>
               <div className="scatter-axis y"></div>
               <div className="scatter-dots">
-                {/* Sample scatter dots */}
-                <div
-                  className="scatter-dot"
-                  style={{ left: "20%", top: "30%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "40%", top: "60%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "60%", top: "80%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "80%", top: "90%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "30%", top: "40%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "50%", top: "70%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "70%", top: "85%" }}
-                ></div>
+                {dashboardData.scatter_data.caps_vs_views.map(
+                  (point, index) => {
+                    const maxViews = Math.max(
+                      ...dashboardData.scatter_data.caps_vs_views.map(
+                        (p) => p.view_count,
+                      ),
+                    );
+                    const maxCaps = Math.max(
+                      ...dashboardData.scatter_data.caps_vs_views.map(
+                        (p) => p.caps_percentage,
+                      ),
+                    );
+                    const left = `${(point.caps_percentage / maxCaps) * 100}%`;
+                    const top = `${100 - (point.view_count / maxViews) * 100}%`;
+                    return (
+                      <div
+                        key={index}
+                        className="scatter-dot"
+                        style={{ left, top }}
+                      ></div>
+                    );
+                  },
+                )}
               </div>
             </div>
           </div>
@@ -131,35 +147,29 @@ const ShortsDashboard: React.FC = () => {
               <div className="scatter-axis x"></div>
               <div className="scatter-axis y"></div>
               <div className="scatter-dots">
-                {/* Sample scatter dots */}
-                <div
-                  className="scatter-dot"
-                  style={{ left: "25%", top: "25%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "45%", top: "55%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "65%", top: "75%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "85%", top: "85%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "35%", top: "35%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "55%", top: "65%" }}
-                ></div>
-                <div
-                  className="scatter-dot"
-                  style={{ left: "75%", top: "80%" }}
-                ></div>
+                {dashboardData.scatter_data.length_vs_views.map(
+                  (point, index) => {
+                    const maxViews = Math.max(
+                      ...dashboardData.scatter_data.length_vs_views.map(
+                        (p) => p.view_count,
+                      ),
+                    );
+                    const maxLength = Math.max(
+                      ...dashboardData.scatter_data.length_vs_views.map(
+                        (p) => p.title_length,
+                      ),
+                    );
+                    const left = `${(point.title_length / maxLength) * 100}%`;
+                    const top = `${100 - (point.view_count / maxViews) * 100}%`;
+                    return (
+                      <div
+                        key={index}
+                        className="scatter-dot"
+                        style={{ left, top }}
+                      ></div>
+                    );
+                  },
+                )}
               </div>
             </div>
           </div>
@@ -168,16 +178,26 @@ const ShortsDashboard: React.FC = () => {
         {/* Top Performing Shorts */}
         <div className="top-shorts">
           <div className="top-shorts-title">TOP PERFORMING SHORTS</div>
-          <div className="short-caption active">
-            this will have some title text example
-            <div className="progress-bar">
-              <div className="progress-fill"></div>
-            </div>
-          </div>
-          <div className="short-caption">oh yes this is another caption</div>
-          <div className="short-caption">this is more text</div>
-          <div className="short-caption">THIS IS A CAPTION AGAINNNN</div>
-          <div className="short-caption">LAST ONE!!!!</div>
+          {dashboardData.top_shorts.map((short, index) => {
+            const maxViews = Math.max(
+              ...dashboardData.top_shorts.map((s) => s.view_count),
+            );
+            const progressPercentage = (short.view_count / maxViews) * 100;
+            return (
+              <div
+                key={index}
+                className={`short-caption ${index === 0 ? "active" : ""}`}
+              >
+                {short.title}
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${progressPercentage}%` }}
+                  ></div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Large Chart */}

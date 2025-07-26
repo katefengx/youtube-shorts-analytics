@@ -131,13 +131,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const channelInput = document.getElementById("channel-id");
   const csvInput = document.getElementById("analytics-csv");
   const analyzeBtn = document.getElementById("analyze-btn");
+  const uploadCsvBtn = document.getElementById("upload-csv-btn");
   const progressSection = document.querySelector(".analysis-progress");
   const progressSteps = document.querySelectorAll(".progress-steps .step");
   const progressFill = document.getElementById("progress-fill-analysis");
   const statusText = document.getElementById("analysis-status");
   let errorBox = document.getElementById("input-error");
-  let analysisUnlocked = false;
+  let channelAnalysisComplete = false;
+  let csvUploadComplete = false;
+
+  // Lock overlays
+  const dashboardOverlay = document.getElementById("dashboard-lock-overlay");
+  const csvOverlay = document.getElementById("csv-lock-overlay");
   const analyticsOverlay = document.getElementById("analytics-lock-overlay");
+  const dashboardSection = document.getElementById("dashboard-section");
+  const csvSection = document.getElementById("csv-upload-section");
   const analyticsSection = document.getElementById("analytics-section");
   const allPages = document.querySelectorAll(".page");
 
@@ -149,7 +157,11 @@ document.addEventListener("DOMContentLoaded", function () {
     errorBox.style.margin = "12px 0";
     errorBox.style.textAlign = "center";
     errorBox.style.display = "none";
-    analyzeBtn.parentNode.insertBefore(errorBox, analyzeBtn);
+    // Insert after the input panel
+    const inputPanel = document.querySelector(".input-panel");
+    if (inputPanel) {
+      inputPanel.parentNode.insertBefore(errorBox, inputPanel.nextSibling);
+    }
   }
 
   function showError(msg) {
@@ -175,46 +187,73 @@ document.addEventListener("DOMContentLoaded", function () {
     return window.scrollY + rect.top;
   }
 
-  // Prevent scroll to analytics if locked
+  // Prevent scroll to locked sections
   let scrollTimeout = null;
   window.addEventListener(
     "scroll",
     function () {
-      if (
-        !analysisUnlocked &&
-        analyticsOverlay &&
-        analyticsOverlay.style.display !== "none"
-      ) {
-        if (scrollTimeout) clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-          const rect = analyticsSection.getBoundingClientRect();
-          // Only snap back if the top of the analytics section is in the viewport (e.g., less than 80px from top)
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        // Check dashboard section
+        if (
+          !channelAnalysisComplete &&
+          dashboardOverlay &&
+          dashboardOverlay.style.display !== "none"
+        ) {
+          const rect = dashboardSection.getBoundingClientRect();
           if (rect.top < 80 && rect.bottom > 0) {
-            // Snap back to previous section
-            const prevSection = allPages[allPages.length - 2];
+            const prevSection = allPages[1]; // channel-id-section
             if (prevSection) {
               prevSection.scrollIntoView({ behavior: "smooth" });
             }
           }
-        }, 60); // debounce for smoothness
-      }
+        }
+
+        // Check CSV section
+        if (
+          !channelAnalysisComplete &&
+          csvOverlay &&
+          csvOverlay.style.display !== "none"
+        ) {
+          const rect = csvSection.getBoundingClientRect();
+          if (rect.top < 80 && rect.bottom > 0) {
+            const prevSection = allPages[1]; // channel-id-section
+            if (prevSection) {
+              prevSection.scrollIntoView({ behavior: "smooth" });
+            }
+          }
+        }
+
+        // Check analytics section
+        if (
+          (!channelAnalysisComplete || !csvUploadComplete) &&
+          analyticsOverlay &&
+          analyticsOverlay.style.display !== "none"
+        ) {
+          const rect = analyticsSection.getBoundingClientRect();
+          if (rect.top < 80 && rect.bottom > 0) {
+            const prevSection = allPages[3]; // csv-upload-section
+            if (prevSection) {
+              prevSection.scrollIntoView({ behavior: "smooth" });
+            }
+          }
+        }
+      }, 60);
     },
     { passive: true },
   );
 
+  // Channel ID Analysis
   analyzeBtn.addEventListener("click", function (e) {
     e.preventDefault();
     clearError();
     const channelId = channelInput.value.trim();
-    const csvFile = csvInput.files[0];
+
     if (!channelId) {
       showError("Please enter a YouTube Channel ID.");
       return;
     }
-    if (!csvFile) {
-      showError("Please upload your analytics CSV file.");
-      return;
-    }
+
     // Basic channel ID validation (should start with UC and be 24 chars)
     if (!/^UC[\w-]{22,23}$/.test(channelId)) {
       showError(
@@ -222,16 +261,19 @@ document.addEventListener("DOMContentLoaded", function () {
       );
       return;
     }
+
     // Show progress and disable button
     progressSection.style.display = "block";
     setStep(0);
     statusText.textContent = "Fetching videos from YouTube...";
     analyzeBtn.disabled = true;
 
-    // Create FormData for the request
+    // Create FormData for the request (without CSV file for now)
     const formData = new FormData();
     formData.append("channelId", channelId);
-    formData.append("csvFile", csvFile);
+    // Add a dummy CSV file for API mode compatibility
+    const dummyCsv = new File([""], "dummy.csv", { type: "text/csv" });
+    formData.append("csvFile", dummyCsv);
 
     // Make API call to backend
     fetch("/api/analyze", {
@@ -264,7 +306,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const summary = data.data.summary;
         const resultsHtml = `
           <div style="margin-top:20px; padding:20px; background: #f8f9fa; border-radius: 8px;">
-            <h3 style="color: #555; margin-bottom: 15px;">Analysis Results</h3>
+            <h3 style="color: #555; margin-bottom: 15px;">Channel Analysis Results</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px;">
               <div style="text-align: center;">
                 <div style="font-size: 2rem; font-weight: bold; color: #e29191;">${summary.total_shorts}</div>
@@ -284,6 +326,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
           </div>
         `;
+
         // Insert results after the progress section
         const resultsDiv = document.createElement("div");
         resultsDiv.innerHTML = resultsHtml;
@@ -291,7 +334,160 @@ document.addEventListener("DOMContentLoaded", function () {
           resultsDiv,
           progressSection.nextSibling,
         );
+
         analyzeBtn.disabled = false;
+        channelAnalysisComplete = true;
+
+        // UNLOCK dashboard section
+        if (dashboardOverlay) {
+          dashboardOverlay.style.opacity = "0";
+          setTimeout(() => {
+            dashboardOverlay.style.display = "none";
+            dashboardOverlay.style.opacity = "1";
+            // Load the React dashboard after a short delay to ensure the section is visible
+            setTimeout(() => {
+              if (window.loadDashboard) {
+                window.loadDashboard();
+              }
+            }, 100);
+          }, 300);
+        }
+
+        // UNLOCK CSV upload section
+        if (csvOverlay) {
+          csvOverlay.style.opacity = "0";
+          setTimeout(() => {
+            csvOverlay.style.display = "none";
+            csvOverlay.style.opacity = "1";
+          }, 300);
+        }
+
+        // Scroll to dashboard section
+        setTimeout(() => {
+          dashboardSection.scrollIntoView({ behavior: "smooth" });
+        }, 500);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        showError(error.message || "An error occurred during analysis");
+        analyzeBtn.disabled = false;
+        progressSection.style.display = "none";
+      });
+  });
+
+  // CSV Upload
+  uploadCsvBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    clearError();
+    const csvFile = csvInput.files[0];
+
+    // Add error box for CSV section if not present
+    let csvErrorBox = document.getElementById("csv-input-error");
+    if (!csvErrorBox) {
+      csvErrorBox = document.createElement("div");
+      csvErrorBox.id = "csv-input-error";
+      csvErrorBox.style.color = "#e29191";
+      csvErrorBox.style.margin = "12px 0";
+      csvErrorBox.style.textAlign = "center";
+      csvErrorBox.style.display = "none";
+      // Insert after the CSV input panel
+      const csvInputPanel = document.querySelector(
+        ".csv-upload-section .input-panel",
+      );
+      if (csvInputPanel) {
+        csvInputPanel.parentNode.insertBefore(
+          csvErrorBox,
+          csvInputPanel.nextSibling,
+        );
+      }
+    }
+
+    function showCsvError(msg) {
+      csvErrorBox.textContent = msg;
+      csvErrorBox.style.display = "block";
+    }
+    function clearCsvError() {
+      csvErrorBox.textContent = "";
+      csvErrorBox.style.display = "none";
+    }
+
+    clearCsvError();
+
+    if (!csvFile) {
+      showCsvError("Please upload your analytics CSV file.");
+      return;
+    }
+
+    if (!channelAnalysisComplete) {
+      showCsvError("Please complete the channel analysis first.");
+      return;
+    }
+
+    // Show progress and disable button
+    uploadCsvBtn.disabled = true;
+    const btnText = uploadCsvBtn.querySelector(".btn-text");
+    const btnLoading = uploadCsvBtn.querySelector(".btn-loading");
+    btnText.style.display = "none";
+    btnLoading.style.display = "inline";
+
+    // Create FormData for the request
+    const formData = new FormData();
+    formData.append("channelId", channelInput.value.trim());
+    formData.append("csvFile", csvFile);
+
+    // Make API call to backend
+    fetch("/api/analyze", {
+      method: "POST",
+      body: formData,
+    })
+      .then(async (response) => {
+        const text = await response.text();
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          throw new Error("Invalid JSON: " + text.substring(0, 200));
+        }
+      })
+      .then((data) => {
+        // Check if we have an error response
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // Check if we have valid data
+        if (!data || !data.sub_peaks || !data.attributions) {
+          throw new Error("Invalid response format from server");
+        }
+
+        // Display success message
+        const successHtml = `
+          <div style="margin-top:20px; padding:20px; background: #e8f5e8; border-radius: 8px; border: 1px solid #4caf50;">
+            <h3 style="color: #2e7d32; margin-bottom: 15px;">✓ CSV Upload Successful</h3>
+            <p style="color: #2e7d32; margin: 0;">
+              Found ${data.sub_peaks.length} subscriber peaks and ${data.attributions.length} attributions. 
+              The Shorts & Subscriber Spikes chart is now unlocked!
+            </p>
+          </div>
+        `;
+
+        // Insert success message after the CSV upload form
+        const successDiv = document.createElement("div");
+        successDiv.innerHTML = successHtml;
+        uploadCsvBtn.parentNode.parentNode.appendChild(successDiv);
+
+        uploadCsvBtn.disabled = false;
+        btnText.style.display = "inline";
+        btnLoading.style.display = "none";
+        csvUploadComplete = true;
+
+        // UNLOCK analytics section
+        if (analyticsOverlay) {
+          analyticsOverlay.style.opacity = "0";
+          setTimeout(() => {
+            analyticsOverlay.style.display = "none";
+            analyticsOverlay.style.opacity = "1";
+          }, 300);
+        }
 
         // --- Use backend data for chart ---
         const subsData = data.sub_stats.map((d) => ({
@@ -326,22 +522,18 @@ document.addEventListener("DOMContentLoaded", function () {
           subPeaks, // peaks
           attributions, // attributions
         );
-        // UNLOCK analytics section
-        analysisUnlocked = true;
-        if (analyticsOverlay) {
-          // Smoothly fade out the overlay
-          analyticsOverlay.style.opacity = "0";
-          setTimeout(() => {
-            analyticsOverlay.style.display = "none";
-            analyticsOverlay.style.opacity = "1"; // Reset for potential reuse
-          }, 300);
-        }
+
+        // Scroll to analytics section
+        setTimeout(() => {
+          analyticsSection.scrollIntoView({ behavior: "smooth" });
+        }, 500);
       })
       .catch((error) => {
         console.error("Error:", error);
-        showError(error.message || "An error occurred during analysis");
-        analyzeBtn.disabled = false;
-        progressSection.style.display = "none";
+        showCsvError(error.message || "An error occurred during CSV upload");
+        uploadCsvBtn.disabled = false;
+        btnText.style.display = "inline";
+        btnLoading.style.display = "none";
       });
   });
 
