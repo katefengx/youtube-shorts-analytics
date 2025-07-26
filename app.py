@@ -117,6 +117,7 @@ def filter_shorts(videos, details, max_seconds=60):
 # --- Analytics processing (from cleaning_data.ipynb) ---
 def process_analytics_data(shorts_path):
     total_stats = pd.read_csv(shorts_path)
+    total_stats['engagement_rate'] = (total_stats['comment_count'] + total_stats['like_count']) / total_stats['view_count']
     total_stats['published_at'] = pd.to_datetime(total_stats['published_at'], utc=True)
     total_stats['date'] = total_stats['published_at'].dt.date
     total_stats['time'] = total_stats['published_at'].dt.time
@@ -262,7 +263,7 @@ def analyze_channel():
                 pd.DataFrame(processed['shorts_data'])[
                     [
                         'video_id', 'title', 'published_at', 'date', 'time', 'hour',
-                        'duration_seconds', 'view_count', 'like_count', 'comment_count',
+                        'duration_seconds', 'view_count', 'like_count', 'comment_count', 'engagement_rate',
                         'has_hashtags', 'hashtag_count', 'has_emojis', 'emoji_count',
                         'clean_title', 'caps_percentage', 'title_length',
                         'sentiment_polarity', 'sentiment_subjectivity', 'time_since_last_post'
@@ -374,7 +375,7 @@ def analyze_channel():
                 pd.DataFrame(processed['shorts_data'])[
                     [
                         'video_id', 'title', 'published_at', 'date', 'time', 'hour',
-                        'duration_seconds', 'view_count', 'like_count', 'comment_count',
+                        'duration_seconds', 'view_count', 'like_count', 'comment_count', 'engagement_rate',
                         'has_hashtags', 'hashtag_count', 'has_emojis', 'emoji_count',
                         'clean_title', 'caps_percentage', 'title_length',
                         'sentiment_polarity', 'sentiment_subjectivity', 'time_since_last_post'
@@ -538,6 +539,30 @@ def get_dashboard_data():
             'length_vs_views': df[['title_length', 'view_count']].dropna().to_dict('records')
         }
         
+            # Prepare time series data for sparklines
+        # Group by week and calculate weekly averages
+        df['date'] = pd.to_datetime(df['date'])
+        
+        # Create week column (Monday as start of week)
+        df['month_start'] = df['date'].dt.to_period('M').dt.start_time
+        
+        monthly_stats = df.groupby('month_start').agg({
+            'view_count': 'mean',
+            'like_count': 'mean', 
+            'comment_count': 'mean'
+        }).reset_index()
+        
+        # Rename week_start back to date for frontend compatibility
+        monthly_stats = monthly_stats.rename(columns={'month_start': 'date'})
+        
+        # Sort by date and format for frontend
+        monthly_stats = monthly_stats.sort_values('date')
+        time_series_data = {
+            'views': monthly_stats[['date', 'view_count']].to_dict('records'),
+            'likes': monthly_stats[['date', 'like_count']].to_dict('records'),
+            'comments': monthly_stats[['date', 'comment_count']].to_dict('records')
+        }
+        
         # Format numbers for display
         def format_number(num):
             if num >= 1000000:
@@ -568,7 +593,8 @@ def get_dashboard_data():
                 'avg_emojis_per_video': round(avg_emojis_per_video, 1)
             },
             'top_shorts': top_shorts,
-            'scatter_data': scatter_data
+            'scatter_data': scatter_data,
+            'time_series_data': time_series_data
         }
         
         print(f"DEBUG: Returning dashboard data with {total_shorts} shorts")

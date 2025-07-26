@@ -10,6 +10,7 @@ export interface ShortData {
   view_count: number;
   like_count: number;
   comment_count: number;
+  engagement_rate: number;
   has_hashtags: boolean;
   hashtag_count: number;
   has_emojis: boolean;
@@ -56,6 +57,20 @@ export interface DashboardData {
     length_vs_views: Array<{
       title_length: number;
       view_count: number;
+    }>;
+  };
+  time_series_data: {
+    views: Array<{
+      date: string;
+      view_count: number;
+    }>;
+    likes: Array<{
+      date: string;
+      like_count: number;
+    }>;
+    comments: Array<{
+      date: string;
+      comment_count: number;
     }>;
   };
 }

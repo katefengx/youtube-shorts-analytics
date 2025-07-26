@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import type { DashboardData, TimeRange } from "./types";
+import type { DashboardData } from "./types";
 import "./ShortsDashboard.css";
-import Slider from "rc-slider";
-import "rc-slider/assets/index.css";
-import { format, parseISO, differenceInDays } from "date-fns";
 import DonutChart from "./components/DonutChart";
+import TimeFilter from "./components/TimeFilter";
+import KPICardsContainer from "./components/KPICardsContainer";
 
 const ShortsDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
@@ -149,56 +148,29 @@ const ShortsDashboard: React.FC = () => {
     <div className="dashboard-container" style={{ position: "relative" }}>
       {loading && <div className="dashboard-loading-overlay"></div>}
       <div className="dashboard-header">
-        <h1 className="dashboard-title">
-          How are your Shorts captions performing?
-        </h1>
-        {allDates.length > 1 && (
-          <div className="timeline-slider">
-            <div className="slider-labels">
-              <span>
-                {format(parseISO(allDates[pendingRange[0]]), "MMM d, yyyy")}
-              </span>
-              <span>
-                {format(parseISO(allDates[pendingRange[1]]), "MMM d, yyyy")}
-              </span>
-            </div>
-            <Slider
-              range
-              min={sliderRange[0]}
-              max={sliderRange[1]}
-              value={pendingRange}
-              onChange={(range) => setPendingRange(range as [number, number])}
-              onAfterChange={(range) =>
-                setSelectedRange(range as [number, number])
-              }
-              allowCross={false}
-              pushable={1}
-            />
-          </div>
-        )}
+        <div className="header-content">
+          <h1 className="dashboard-title">
+            How are your Shorts captions performing?
+          </h1>
+          <TimeFilter
+            allDates={allDates}
+            sliderRange={sliderRange}
+            pendingRange={pendingRange}
+            onPendingRangeChange={setPendingRange}
+            onSelectedRangeChange={setSelectedRange}
+          />
+        </div>
       </div>
 
       <div className="dashboard-grid">
         {/* Summary Cards - KPI Row */}
-        <div className="summary-cards">
-          <div className="card">
-            <div className="card-title">AVG. VIEWS</div>
-            <div className="card-value">{filteredData.summary.avg_views}</div>
-            <div className="sparkline"></div>
-          </div>
-          <div className="card">
-            <div className="card-title">AVG. LIKES</div>
-            <div className="card-value">{filteredData.summary.avg_likes}</div>
-            <div className="sparkline"></div>
-          </div>
-          <div className="card">
-            <div className="card-title">AVG. COMMENTS</div>
-            <div className="card-value">
-              {filteredData.summary.avg_comments}
-            </div>
-            <div className="sparkline"></div>
-          </div>
-        </div>
+        <KPICardsContainer
+          avgViews={filteredData.summary.avg_views}
+          avgLikes={filteredData.summary.avg_likes}
+          avgComments={filteredData.summary.avg_comments}
+          timeSeriesData={filteredData.time_series_data}
+          className="summary-cards"
+        />
 
         {/* Donut Charts Column */}
         <div className="donut-charts">

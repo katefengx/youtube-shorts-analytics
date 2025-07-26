@@ -1,0 +1,11 @@
+.kpi-cards-container {
+  display: flex;
+  gap: 1.5rem;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+  .kpi-cards-container {
+    flex-direction: column;
+  }
+}

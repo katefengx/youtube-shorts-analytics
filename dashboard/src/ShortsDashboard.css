@@ -11,32 +11,20 @@
   margin-bottom: 2rem;
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
 .dashboard-title {
   font-size: 2.5rem;
   font-weight: 700;
   color: #ae3131;
-  margin-bottom: 0.5rem;
-  text-align: left;
-}
-
-.timeline-slider {
-  margin: 1.5rem 0 2rem 0;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 1rem 2rem;
-  background: #fff0f0;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(255, 107, 107, 0.08);
-}
-
-.slider-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #ae3131;
-  margin-bottom: 0.5rem;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .dashboard-grid {
@@ -53,58 +41,6 @@
 
 .summary-cards {
   grid-area: summary;
-  display: flex;
-  gap: 1.5rem;
-}
-
-.card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 1.5rem;
-  flex: 1;
-  text-align: center;
-  font-weight: 600;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: none;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-}
-
-.card-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.5rem;
-}
-
-.card-value {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.sparkline {
-  width: 60px;
-  height: 20px;
-  margin: 0 auto;
-  background: linear-gradient(
-    90deg,
-    #ddd 0%,
-    #ddd 30%,
-    #ff6b6b 70%,
-    #ff6b6b 100%
-  );
-  border-radius: 10px;
-  opacity: 0.6;
 }
 
 .donut-charts {
@@ -365,10 +301,6 @@
     grid-gap: 1rem;
   }
 
-  .summary-cards {
-    flex-direction: column;
-  }
-
   .scatter-charts {
     flex-direction: column;
   }
@@ -380,5 +312,33 @@
   .timeline-filter,
   .timeline-button {
     display: none;
+  }
+}
+
+/* Header responsive design */
+@media (max-width: 1024px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .time-filter {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    gap: 0.5rem;
+  }
+
+  .dashboard-title {
+    font-size: 1.8rem;
+  }
+
+  .time-filter {
+    padding: 0.75rem;
   }
 }

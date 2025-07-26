@@ -1,0 +1,53 @@
+.time-filter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #fff0f0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.1);
+  min-width: 400px;
+  width: 500px;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ae3131;
+}
+
+/* Override rc-slider styles for better integration */
+.time-filter .rc-slider {
+  width: 100%;
+  margin: 0;
+}
+
+.time-filter .rc-slider-rail {
+  background-color: #e0e0e0;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.time-filter .rc-slider-track {
+  background-color: #ff6b6b;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.time-filter .rc-slider-handle {
+  border: 2px solid #ff6b6b;
+  background-color: white;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.time-filter .rc-slider-handle:hover {
+  border-color: #e55a5a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
