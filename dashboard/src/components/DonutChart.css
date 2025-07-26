@@ -1,0 +1,44 @@
+.donut-chart_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin: 0 10px;
+}
+
+.donut-chart_label {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.donut-chart_icon {
+  font-size: 1.5em;
+  margin-bottom: 4px;
+}
+
+.donut-chart_text {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.donut-chart_breakdown {
+  color: #666;
+  font-size: 0.85em;
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.donut-chart_description {
+  color: #888;
+  font-size: 0.9em;
+  margin-top: 8px;
+  text-align: center;
+}

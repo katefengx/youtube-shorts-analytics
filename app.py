@@ -12,6 +12,7 @@ import subprocess
 import sys
 import shutil
 from dotenv import load_dotenv
+import emoji
 load_dotenv()
 
 app = Flask(__name__)
@@ -128,8 +129,9 @@ def process_analytics_data(shorts_path):
     # Add features
     shorts['has_hashtags'] = shorts['title'].str.contains('#', na=False)
     shorts['hashtag_count'] = shorts['title'].str.count('#')
-    shorts['has_emojis'] = shorts['title'].str.contains(r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F1E0-\U0001F1FF]', regex=True, na=False)
-    shorts['emoji_count'] = shorts['title'].str.count(r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F1E0-\U0001F1FF]')
+
+    shorts['has_emojis'] = shorts['title'].apply(lambda x: emoji.emoji_count(str(x)) > 0)
+    shorts['emoji_count'] = shorts['title'].apply(lambda x: emoji.emoji_count(str(x)))
     
     def clean_title(title):
         return re.sub(r'#\S+', '', title).strip()
@@ -484,11 +486,38 @@ def get_dashboard_data():
     try:
         df = pd.read_csv(processed_shorts_path)
         
+        # Get date range parameters from query string
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        
+        # Get filter parameters from query string (support multiple filters)
+        hashtag_filter = request.args.get('hashtag_filter')  # 'true', 'false', or None
+        emoji_filter = request.args.get('emoji_filter')  # 'true', 'false', or None
+        
+        # Filter data by date range if provided
+        if start_date and end_date:
+            print(f"DEBUG: Filtering data from {start_date} to {end_date}")
+            df['date'] = pd.to_datetime(df['date'])
+            df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
+            print(f"DEBUG: Date filtered data contains {len(df)} records")
+        
+        # Apply hashtag filter if provided
+        if hashtag_filter is not None:
+            has_hashtags = hashtag_filter.lower() == 'true'
+            df = df[df['has_hashtags'] == has_hashtags]
+            print(f"DEBUG: Filtered by hashtags (has_hashtags={has_hashtags}), {len(df)} records remaining")
+        
+        # Apply emoji filter if provided
+        if emoji_filter is not None:
+            has_emojis = emoji_filter.lower() == 'true'
+            df = df[df['has_emojis'] == has_emojis]
+            print(f"DEBUG: Filtered by emojis (has_emojis={has_emojis}), {len(df)} records remaining")
+        
         # Calculate dashboard statistics
         total_shorts = len(df)
-        avg_views = float(df['view_count'].mean())
-        avg_likes = float(df['like_count'].mean())
-        avg_comments = float(df['comment_count'].mean())
+        avg_views = float(df['view_count'].mean()) if total_shorts > 0 else 0
+        avg_likes = float(df['like_count'].mean()) if total_shorts > 0 else 0
+        avg_comments = float(df['comment_count'].mean()) if total_shorts > 0 else 0
         
         # Hashtag statistics
         shorts_with_hashtags = df[df['has_hashtags'] == True]
@@ -530,6 +559,7 @@ def get_dashboard_data():
             },
             'hashtag_stats': {
                 'usage_percentage': round(hashtag_usage_percentage, 1),
+                'non_usage_percentage': round(100 - hashtag_usage_percentage, 1),
                 'avg_hashtags_per_video': round(avg_hashtags_per_video, 1)
             },
             'emoji_stats': {

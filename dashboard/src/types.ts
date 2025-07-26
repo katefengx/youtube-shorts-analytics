@@ -57,3 +57,9 @@ export interface DashboardData {
     }>;
   };
 }
+
+export interface TimeRange {
+  label: string;
+  startDate: string;
+  endDate: string;
+}

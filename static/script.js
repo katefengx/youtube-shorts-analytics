@@ -144,6 +144,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const dashboardOverlay = document.getElementById("dashboard-lock-overlay");
   const csvOverlay = document.getElementById("csv-lock-overlay");
   const analyticsOverlay = document.getElementById("analytics-lock-overlay");
+
+  // Auto-load dashboard for development
+  setTimeout(() => {
+    if (window.loadDashboard) {
+      window.loadDashboard();
+    }
+  }, 1000);
   const dashboardSection = document.getElementById("dashboard-section");
   const csvSection = document.getElementById("csv-upload-section");
   const analyticsSection = document.getElementById("analytics-section");

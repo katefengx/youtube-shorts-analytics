@@ -14,36 +14,29 @@
 .dashboard-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #333;
+  color: #ae3131;
   margin-bottom: 0.5rem;
-  text-align: center;
+  text-align: left;
 }
 
-.timeline-bar {
-  height: 4px;
-  background: #ff6b6b; /* Vibrant pink accent */
-  border-radius: 2px;
-  margin: 1rem auto;
-  max-width: 400px;
-  position: relative;
+.timeline-slider {
+  margin: 1.5rem 0 2rem 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1rem 2rem;
+  background: #fff0f0;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(255, 107, 107, 0.08);
 }
 
-.timeline-bar::before,
-.timeline-bar::after {
-  content: "";
-  position: absolute;
-  top: -4px;
-  width: 2px;
-  height: 12px;
-  background: #ff6b6b;
-}
-
-.timeline-bar::before {
-  left: 0;
-}
-
-.timeline-bar::after {
-  right: 0;
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ae3131;
+  margin-bottom: 0.5rem;
 }
 
 .dashboard-grid {
@@ -118,67 +111,43 @@
   grid-area: donut;
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
   gap: 1.5rem;
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+.donut-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .donut-instruction {
   font-size: 0.875rem;
   color: #ff6b6b;
-  text-align: center;
-  margin-bottom: 1rem;
   font-weight: 500;
 }
 
-.donut-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 1.5rem;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+.reset-filters-btn {
+  background: #ff6b6b;
+  color: white;
   border: none;
-}
-
-.donut-chart {
-  width: 120px;
-  height: 120px;
-  margin: 0 auto 1rem;
-  border-radius: 50%;
-  background: conic-gradient(#ff6b6b 0deg 180deg, #f0f0f0 180deg 360deg);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.donut-chart::before {
-  content: "";
-  width: 80px;
-  height: 80px;
-  background: white;
-  border-radius: 50%;
-  position: absolute;
-}
-
-.donut-icon {
-  position: relative;
-  z-index: 1;
-  font-size: 1.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.donut-label {
-  position: relative;
-  z-index: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.donut-description {
-  font-size: 0.875rem;
-  color: #ff6b6b;
-  font-weight: 500;
-  margin-top: 0.5rem;
+.reset-filters-btn:hover {
+  background: #e55a5a;
 }
 
 .scatter-charts {
@@ -365,6 +334,21 @@
   color: #999;
 }
 
+.dashboard-container .dashboard-loading-overlay {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(255, 240, 240, 0.8) !important;
+  z-index: 9999 !important;
+  pointer-events: none !important;
+  transition: opacity 0.1s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .dashboard-grid {
@@ -391,5 +375,10 @@
 
   .dashboard-title {
     font-size: 2rem;
+  }
+
+  .timeline-filter,
+  .timeline-button {
+    display: none;
   }
 }
