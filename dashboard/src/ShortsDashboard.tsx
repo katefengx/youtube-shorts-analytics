@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import type { DashboardData } from "./types";
 import "./ShortsDashboard.css";
 import DonutChart from "./components/DonutChart";
+import EngagementBarChart from "./components/EngagementBarChart";
 import TimeFilter from "./components/TimeFilter";
-import KPICardsContainer from "./components/KPICardsContainer";
+import AreaChart from "./components/AreaChart";
+import TopPerformingShorts from "./components/TopPerformingShorts";
 
 const ShortsDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
@@ -147,36 +149,124 @@ const ShortsDashboard: React.FC = () => {
   return (
     <div className="dashboard-container" style={{ position: "relative" }}>
       {loading && <div className="dashboard-loading-overlay"></div>}
+
+      {/* Header Section with Right Side Content */}
       <div className="dashboard-header">
         <div className="header-content">
-          <h1 className="dashboard-title">
-            How are your Shorts captions performing?
-          </h1>
-          <TimeFilter
-            allDates={allDates}
-            sliderRange={sliderRange}
-            pendingRange={pendingRange}
-            onPendingRangeChange={setPendingRange}
-            onSelectedRangeChange={setSelectedRange}
-          />
+          <div>
+            <h1 className="dashboard-title">
+              Youtube Shorts Caption Performance Dashboard
+            </h1>
+            <p className="dashboard-subtitle">
+              Track how different captions impact your Shorts' success.
+            </p>
+            <div className="summary-metrics">
+              <div className="summary-metric">
+                <span className="summary-metric-value">
+                  {filteredData.summary.total_shorts}
+                </span>
+                <span className="summary-metric-label">SHORTS POSTED</span>
+              </div>
+              <div className="summary-metric">
+                <span className="summary-metric-value">
+                  {filteredData.summary.avg_shorts_per_day}
+                </span>
+                <span className="summary-metric-label">
+                  AVG. SHORTS PER DAY
+                </span>
+              </div>
+              <div className="summary-metric">
+                <span className="summary-metric-value">
+                  {filteredData.summary.avg_words || "6.92"}
+                </span>
+                <span className="summary-metric-label">WORDS PER CAPTION</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side Content */}
+        <div className="header-right-content">
+          {/* Date Range Section */}
+          <div className="date-range-section">
+            <TimeFilter
+              allDates={allDates}
+              sliderRange={sliderRange}
+              pendingRange={pendingRange}
+              onPendingRangeChange={setPendingRange}
+              onSelectedRangeChange={setSelectedRange}
+            />
+          </div>
+
+          {/* Performance Metrics */}
+          <div className="performance-metrics">
+            <div className="metric-card">
+              <span className="metric-value">
+                {filteredData.summary.avg_views}
+              </span>
+              <span className="metric-label">AVG. VIEWS</span>
+              {filteredData.time_series_data?.views && (
+                <div className="metric-chart">
+                  <AreaChart
+                    data={filteredData.time_series_data.views.map((item) => ({
+                      date: item.date,
+                      value: item.view_count,
+                    }))}
+                    width={120}
+                    height={40}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="metric-card">
+              <span className="metric-value">
+                {filteredData.summary.avg_likes}
+              </span>
+              <span className="metric-label">AVG. LIKES</span>
+              {filteredData.time_series_data?.likes && (
+                <div className="metric-chart">
+                  <AreaChart
+                    data={filteredData.time_series_data.likes.map((item) => ({
+                      date: item.date,
+                      value: item.like_count,
+                    }))}
+                    width={120}
+                    height={40}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="metric-card">
+              <span className="metric-value">
+                {filteredData.summary.avg_comments}
+              </span>
+              <span className="metric-label">AVG. COMMENTS</span>
+              {filteredData.time_series_data?.comments && (
+                <div className="metric-chart">
+                  <AreaChart
+                    data={filteredData.time_series_data.comments.map(
+                      (item) => ({
+                        date: item.date,
+                        value: item.comment_count,
+                      }),
+                    )}
+                    width={120}
+                    height={40}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="dashboard-grid">
-        {/* Summary Cards - KPI Row */}
-        <KPICardsContainer
-          avgViews={filteredData.summary.avg_views}
-          avgLikes={filteredData.summary.avg_likes}
-          avgComments={filteredData.summary.avg_comments}
-          timeSeriesData={filteredData.time_series_data}
-          className="summary-cards"
-        />
-
-        {/* Donut Charts Column */}
-        <div className="donut-charts">
+        {/* Engagement Analysis */}
+        <div className="engagement-analysis">
           <div className="donut-header">
             <div className="donut-instruction">
-              Click on sections in the donut charts to filter charts
+              Click on sections in the charts to filter the dashboard by hashtag
+              and emoji use.
             </div>
             {(activeFilters.hashtags !== undefined ||
               activeFilters.emojis !== undefined) && (
@@ -189,133 +279,211 @@ const ShortsDashboard: React.FC = () => {
               </button>
             )}
           </div>
-          <DonutChart
-            usage_percentage={filteredData.hashtag_stats.usage_percentage}
-            non_usage_percentage={
-              filteredData.hashtag_stats.non_usage_percentage
-            }
-            label={`USE`}
-            icon={<span>#</span>}
-            title="hashtags"
-            description={`${filteredData.hashtag_stats.avg_hashtags_per_video} hashtags per Short`}
-            onFilterChange={handleFilterChange}
-          />
-          <DonutChart
-            usage_percentage={filteredData.emoji_stats.usage_percentage}
-            non_usage_percentage={filteredData.emoji_stats.non_usage_percentage}
-            label={`USE`}
-            icon={<span>😀</span>}
-            title="emojis"
-            description={`${filteredData.emoji_stats.avg_emojis_per_video} emojis per Short`}
-            onFilterChange={handleFilterChange}
-          />
-        </div>
 
-        {/* Scatter Charts */}
-        <div className="scatter-charts">
-          <div className="scatter-card">
-            <div className="scatter-title">
-              How does % of capitalized letters affect the number of views?
-            </div>
-            <div className="scatter-chart">
-              <div className="scatter-axis x"></div>
-              <div className="scatter-axis y"></div>
-              <div className="scatter-dots">
-                {filteredData.scatter_data.caps_vs_views.map((point, index) => {
-                  const maxViews = Math.max(
-                    ...filteredData.scatter_data.caps_vs_views.map(
-                      (p) => p.view_count,
-                    ),
-                  );
-                  const maxCaps = Math.max(
-                    ...filteredData.scatter_data.caps_vs_views.map(
-                      (p) => p.caps_percentage,
-                    ),
-                  );
-                  const left = `${(point.caps_percentage / maxCaps) * 100}%`;
-                  const top = `${100 - (point.view_count / maxViews) * 100}%`;
-                  return (
-                    <div
-                      key={index}
-                      className="scatter-dot"
-                      style={{ left, top }}
-                    ></div>
-                  );
-                })}
-              </div>
+          {/* Hashtag Section */}
+          <div className="engagement-section">
+            <div className="engagement-charts">
+              <DonutChart
+                usage_percentage={filteredData.hashtag_stats.usage_percentage}
+                non_usage_percentage={
+                  filteredData.hashtag_stats.non_usage_percentage
+                }
+                label={`USE`}
+                icon={<span>#</span>}
+                title="hashtags"
+                description={`${filteredData.hashtag_stats.avg_hashtags_per_video} hashtags per Short with hashtags`}
+                onFilterChange={handleFilterChange}
+              />
+              <EngagementBarChart
+                withFeaturePercentage={
+                  filteredData.hashtag_stats.engagement_with
+                }
+                withoutFeaturePercentage={
+                  filteredData.hashtag_stats.engagement_without
+                }
+                featureName="hashtags"
+              />
             </div>
           </div>
-          <div className="scatter-card">
-            <div className="scatter-title">
-              How does caption length affect the number of views?
-            </div>
-            <div className="scatter-chart">
-              <div className="scatter-axis x"></div>
-              <div className="scatter-axis y"></div>
-              <div className="scatter-dots">
-                {filteredData.scatter_data.length_vs_views.map(
-                  (point, index) => {
-                    const maxViews = Math.max(
-                      ...filteredData.scatter_data.length_vs_views.map(
-                        (p) => p.view_count,
-                      ),
-                    );
-                    const maxLength = Math.max(
-                      ...filteredData.scatter_data.length_vs_views.map(
-                        (p) => p.title_length,
-                      ),
-                    );
-                    const left = `${(point.title_length / maxLength) * 100}%`;
-                    const top = `${100 - (point.view_count / maxViews) * 100}%`;
-                    return (
-                      <div
-                        key={index}
-                        className="scatter-dot"
-                        style={{ left, top }}
-                      ></div>
-                    );
-                  },
-                )}
-              </div>
+
+          {/* Emoji Section */}
+          <div className="engagement-section">
+            <div className="engagement-charts">
+              <DonutChart
+                usage_percentage={filteredData.emoji_stats.usage_percentage}
+                non_usage_percentage={
+                  filteredData.emoji_stats.non_usage_percentage
+                }
+                label={`USE`}
+                icon={<span>😀</span>}
+                title="emojis"
+                description={`${filteredData.emoji_stats.avg_emojis_per_video} emojis per Short with emojis`}
+                onFilterChange={handleFilterChange}
+              />
+              <EngagementBarChart
+                withFeaturePercentage={filteredData.emoji_stats.engagement_with}
+                withoutFeaturePercentage={
+                  filteredData.emoji_stats.engagement_without
+                }
+                featureName="emojis"
+              />
             </div>
           </div>
         </div>
 
         {/* Top Performing Shorts */}
-        <div className="top-shorts">
-          <div className="top-shorts-title">TOP PERFORMING SHORTS</div>
-          {filteredData.top_shorts.map((short, index) => {
-            const maxViews = Math.max(
-              ...filteredData.top_shorts.map((s) => s.view_count),
-            );
-            const progressPercentage = (short.view_count / maxViews) * 100;
-            return (
+        <TopPerformingShorts topShorts={filteredData.top_shorts} />
+
+        {/* Sentiment Section */}
+        <div className="sentiment-section">
+          <div className="section-title">SENTIMENT ANALYSIS</div>
+          <div className="section-subtitle">
+            avg. likes across caption sentiments (TextBlob)
+          </div>
+          <div className="sentiment-chart">
+            {/* Placeholder for sentiment bar chart */}
+            <div
+              style={{
+                height: "150px",
+                display: "flex",
+                alignItems: "end",
+                gap: "1rem",
+              }}
+            >
               <div
-                key={index}
-                className={`short-caption ${index === 0 ? "active" : ""}`}
-              >
-                {short.title}
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${progressPercentage}%` }}
-                  ></div>
-                </div>
-              </div>
-            );
-          })}
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ddd",
+                  height: "60%",
+                  borderRadius: "4px",
+                }}
+              ></div>
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ddd",
+                  height: "100%",
+                  borderRadius: "4px",
+                }}
+              ></div>
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ddd",
+                  height: "40%",
+                  borderRadius: "4px",
+                }}
+              ></div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "0.5rem",
+              }}
+            >
+              <span style={{ fontSize: "0.75rem", color: "#666" }}>
+                NEGATIVE
+              </span>
+              <span style={{ fontSize: "0.75rem", color: "#666" }}>
+                NEUTRAL
+              </span>
+              <span style={{ fontSize: "0.75rem", color: "#666" }}>
+                POSITIVE
+              </span>
+            </div>
+          </div>
+
+          <div className="section-title" style={{ marginTop: "2rem" }}>
+            POSTING SCHEDULE
+          </div>
+          <div className="section-subtitle">
+            how many Shorts are posted each day
+          </div>
+          <div className="posting-schedule-chart">
+            {/* Placeholder for posting schedule bar chart */}
+            <div
+              style={{
+                height: "120px",
+                display: "flex",
+                alignItems: "end",
+                gap: "0.5rem",
+              }}
+            >
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ddd",
+                  height: "80%",
+                  borderRadius: "4px",
+                }}
+              ></div>
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ddd",
+                  height: "90%",
+                  borderRadius: "4px",
+                }}
+              ></div>
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ddd",
+                  height: "70%",
+                  borderRadius: "4px",
+                }}
+              ></div>
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ff6b6b",
+                  height: "100%",
+                  borderRadius: "4px",
+                }}
+              ></div>
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ddd",
+                  height: "60%",
+                  borderRadius: "4px",
+                }}
+              ></div>
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ddd",
+                  height: "50%",
+                  borderRadius: "4px",
+                }}
+              ></div>
+              <div
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ddd",
+                  height: "40%",
+                  borderRadius: "4px",
+                }}
+              ></div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "0.5rem",
+              }}
+            >
+              <span style={{ fontSize: "0.75rem", color: "#666" }}>M</span>
+              <span style={{ fontSize: "0.75rem", color: "#666" }}>T</span>
+              <span style={{ fontSize: "0.75rem", color: "#666" }}>W</span>
+              <span style={{ fontSize: "0.75rem", color: "#666" }}>T</span>
+              <span style={{ fontSize: "0.75rem", color: "#666" }}>F</span>
+              <span style={{ fontSize: "0.75rem", color: "#666" }}>S</span>
+              <span style={{ fontSize: "0.75rem", color: "#666" }}>S</span>
+            </div>
+          </div>
         </div>
-
-        {/* Large Chart */}
-        <div className="large-chart">TBD</div>
-
-        {/* Small Cards */}
-        <div className="small-card">TBD</div>
-        <div className="small-card">TBD</div>
-        <div className="small-card">TBD</div>
-
-        {/* Wide Card */}
-        <div className="wide-card">TBD</div>
       </div>
     </div>
   );

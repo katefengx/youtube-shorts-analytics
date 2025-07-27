@@ -16,11 +16,10 @@ export interface ShortData {
   has_emojis: boolean;
   emoji_count: number;
   clean_title: string;
-  caps_percentage: number;
-  title_length: number;
+  num_words: number;
   sentiment_polarity: number;
-  sentiment_subjectivity: number;
-  time_since_last_post: number;
+  sentiment: string;
+  day_of_week: string;
 }
 
 export interface DashboardData {
@@ -29,6 +28,8 @@ export interface DashboardData {
     avg_views: string;
     avg_likes: string;
     avg_comments: string;
+    avg_words: number;
+    avg_shorts_per_day: number;
     avg_views_raw: number;
     avg_likes_raw: number;
     avg_comments_raw: number;
@@ -37,11 +38,21 @@ export interface DashboardData {
     usage_percentage: number;
     non_usage_percentage: number;
     avg_hashtags_per_video: number;
+    engagement_with: number;
+    engagement_without: number;
   };
   emoji_stats: {
     usage_percentage: number;
     non_usage_percentage: number;
     avg_emojis_per_video: number;
+    engagement_with: number;
+    engagement_without: number;
+  };
+  sentiment_stats: {
+    [key: string]: number;
+  };
+  posting_schedule: {
+    [key: string]: number;
   };
   top_shorts: Array<{
     title: string;
@@ -50,12 +61,12 @@ export interface DashboardData {
     comment_count: number;
   }>;
   scatter_data: {
-    caps_vs_views: Array<{
-      caps_percentage: number;
-      view_count: number;
+    duration_vs_engagement: Array<{
+      duration_seconds: number;
+      engagement_rate: number;
     }>;
-    length_vs_views: Array<{
-      title_length: number;
+    words_vs_views: Array<{
+      num_words: number;
       view_count: number;
     }>;
   };

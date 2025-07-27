@@ -65,10 +65,6 @@ const DonutChart: React.FC<DonutChartProps> = ({
         <div className="donut-chart_icon">{icon}</div>
         <div className="donut-chart_text">{label}</div>
       </div>
-      <div className="donut-chart_breakdown">
-        {usage_percentage}% use {title} • {non_usage_percentage}% don't use{" "}
-        {title}
-      </div>
       <div className="donut-chart_description">{description}</div>
     </div>
   );

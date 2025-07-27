@@ -9,14 +9,21 @@
 
 .dashboard-header {
   margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
 }
 
 .header-content {
+  flex: 1;
+}
+
+.header-right-content {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-end;
 }
 
 .dashboard-title {
@@ -27,34 +34,153 @@
   flex-shrink: 0;
 }
 
+.dashboard-subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin: 0.5rem 0 1rem 0;
+  font-weight: 400;
+}
+
+.summary-metrics {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.summary-metric {
+  text-align: center;
+}
+
+.summary-metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ae3131;
+  display: block;
+}
+
+.summary-metric-label {
+  font-size: 0.875rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-areas:
-    "summary summary summary top"
-    "donut scatter scatter top"
-    "donut large large large"
-    "donut small1 small2 small3"
-    "donut wide wide wide";
+    "engagement performance sentiment"
+    "engagement performance sentiment";
+  grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 1.5rem;
   margin-top: 2rem;
 }
 
-.summary-cards {
-  grid-area: summary;
+.date-range-section {
+  /* No longer in grid */
 }
 
-.donut-charts {
-  grid-area: donut;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  gap: 1.5rem;
+.performance-metrics {
+  grid-area: metrics;
+}
+
+.engagement-analysis {
+  grid-area: engagement;
   background-color: #fff;
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: none;
+}
+
+.engagement-section {
+  margin-bottom: 2rem;
+}
+
+.engagement-section:last-child {
+  margin-bottom: 0;
+}
+
+.engagement-charts {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.performance-section {
+  grid-area: performance;
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+.sentiment-section {
+  grid-area: sentiment;
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+/* Section titles */
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.section-subtitle {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+/* Performance metrics cards */
+.performance-metrics {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: flex-end;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.metric-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: none;
+  min-width: 120px;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ae3131;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-chart {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: center;
 }
 
 .donut-header {
@@ -287,22 +413,24 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .dashboard-grid {
-    grid-template-areas:
-      "summary"
-      "top"
-      "donut"
-      "scatter"
-      "large"
-      "small1"
-      "small2"
-      "small3"
-      "wide";
-    grid-gap: 1rem;
+  .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
   }
 
-  .scatter-charts {
+  .header-right-content {
+    align-items: center;
+    width: 100%;
+  }
+
+  .performance-metrics {
     flex-direction: column;
+    align-items: center;
+  }
+
+  .metric-card {
+    min-width: unset;
+    width: 100%;
   }
 
   .dashboard-title {

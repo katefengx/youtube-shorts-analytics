@@ -118,6 +118,7 @@ def filter_shorts(videos, details, max_seconds=60):
 def process_analytics_data(shorts_path):
     total_stats = pd.read_csv(shorts_path)
     total_stats['engagement_rate'] = (total_stats['comment_count'] + total_stats['like_count']) / total_stats['view_count']
+    total_stats['num_words'] = total_stats['title'].str.split().str.len()
     total_stats['published_at'] = pd.to_datetime(total_stats['published_at'], utc=True)
     total_stats['date'] = total_stats['published_at'].dt.date
     total_stats['time'] = total_stats['published_at'].dt.time
@@ -136,26 +137,16 @@ def process_analytics_data(shorts_path):
     
     def clean_title(title):
         return re.sub(r'#\S+', '', title).strip()
-    def caps_percentage(title):
-        if not title:
-            return 0
-        total_alpha = sum(c.isalpha() for c in title)
-        if total_alpha == 0:
-            return 0
-        upper_alpha = sum(c.isupper() for c in title)
-        return (upper_alpha / total_alpha) * 100
 
     shorts['clean_title'] = shorts['title'].apply(clean_title)
-    shorts['caps_percentage'] = shorts['clean_title'].apply(caps_percentage)
-    shorts['title_length'] = shorts['clean_title'].str.len()
+    shorts['title_length'] = shorts['title'].str.len()
     def compute_sentiment(text):
         blob = TextBlob(text)
-        return blob.sentiment.polarity, blob.sentiment.subjectivity
-    sentiments = shorts['clean_title'].apply(compute_sentiment)
-    shorts['sentiment_polarity'] = sentiments.apply(lambda x: x[0])
-    shorts['sentiment_subjectivity'] = sentiments.apply(lambda x: x[1])
+        return blob.sentiment.polarity
+    shorts['sentiment_polarity'] = shorts['clean_title'].apply(compute_sentiment)
+    shorts['sentiment'] = shorts['sentiment_polarity'].apply(lambda x: 'positive' if x > 0 else 'negative' if x < 0 else 'neutral')
+    shorts['day_of_week'] = pd.to_datetime(shorts['date']).dt.day_name()
     shorts = shorts.sort_values('published_at')
-    shorts['time_since_last_post'] = shorts['published_at'].diff().dt.total_seconds().fillna(0)
 
     # Group by day
     by_day = shorts.groupby('date').agg(
@@ -265,8 +256,8 @@ def analyze_channel():
                         'video_id', 'title', 'published_at', 'date', 'time', 'hour',
                         'duration_seconds', 'view_count', 'like_count', 'comment_count', 'engagement_rate',
                         'has_hashtags', 'hashtag_count', 'has_emojis', 'emoji_count',
-                        'clean_title', 'caps_percentage', 'title_length',
-                        'sentiment_polarity', 'sentiment_subjectivity', 'time_since_last_post'
+                        'clean_title', 'num_words',
+                        'sentiment_polarity', 'sentiment', 'day_of_week'
                     ]
                 ].to_csv(processed_shorts_path, index=False)
                 shutil.copy(processed_shorts_path, 'data/processed_shorts.csv')
@@ -377,8 +368,8 @@ def analyze_channel():
                         'video_id', 'title', 'published_at', 'date', 'time', 'hour',
                         'duration_seconds', 'view_count', 'like_count', 'comment_count', 'engagement_rate',
                         'has_hashtags', 'hashtag_count', 'has_emojis', 'emoji_count',
-                        'clean_title', 'caps_percentage', 'title_length',
-                        'sentiment_polarity', 'sentiment_subjectivity', 'time_since_last_post'
+                        'clean_title', 'num_words',
+                        'sentiment_polarity', 'sentiment', 'day_of_week'
                     ]
                 ].to_csv(processed_shorts_path, index=False)
                 shutil.copy(processed_shorts_path, 'data/processed_shorts.csv')
@@ -519,24 +510,53 @@ def get_dashboard_data():
         avg_views = float(df['view_count'].mean()) if total_shorts > 0 else 0
         avg_likes = float(df['like_count'].mean()) if total_shorts > 0 else 0
         avg_comments = float(df['comment_count'].mean()) if total_shorts > 0 else 0
+        avg_words = float(df['num_words'].mean()) if total_shorts > 0 else 0
+        
+        # Calculate average shorts per day
+        df['date'] = pd.to_datetime(df['date'])
+        shorts_per_day = df.groupby('date').size()
+        avg_shorts_per_day = float(shorts_per_day.mean()) if len(shorts_per_day) > 0 else 0
         
         # Hashtag statistics
         shorts_with_hashtags = df[df['has_hashtags'] == True]
+        shorts_without_hashtags = df[df['has_hashtags'] == False]
         hashtag_usage_percentage = (len(shorts_with_hashtags) / total_shorts) * 100 if total_shorts > 0 else 0
         avg_hashtags_per_video = float(shorts_with_hashtags['hashtag_count'].mean()) if len(shorts_with_hashtags) > 0 else 0
         
+        # Hashtag engagement rates
+        # Handle NaN and infinite values
+        hashtag_engagement_with = shorts_with_hashtags['engagement_rate'].replace([np.inf, -np.inf], np.nan).dropna()
+        hashtag_engagement_without = shorts_without_hashtags['engagement_rate'].replace([np.inf, -np.inf], np.nan).dropna()
+        
+        avg_engagement_with_hashtags = float(hashtag_engagement_with.mean() * 100) if len(hashtag_engagement_with) > 0 else 0
+        avg_engagement_without_hashtags = float(hashtag_engagement_without.mean() * 100) if len(hashtag_engagement_without) > 0 else 0
+        
         # Emoji statistics
         shorts_with_emojis = df[df['has_emojis'] == True]
+        shorts_without_emojis = df[df['has_emojis'] == False]
         emoji_usage_percentage = (len(shorts_with_emojis) / total_shorts) * 100 if total_shorts > 0 else 0
         avg_emojis_per_video = float(shorts_with_emojis['emoji_count'].mean()) if len(shorts_with_emojis) > 0 else 0
+        
+        # Emoji engagement rates
+        # Handle NaN and infinite values
+        emoji_engagement_with = shorts_with_emojis['engagement_rate'].replace([np.inf, -np.inf], np.nan).dropna()
+        emoji_engagement_without = shorts_without_emojis['engagement_rate'].replace([np.inf, -np.inf], np.nan).dropna()
+        
+        avg_engagement_with_emojis = float(emoji_engagement_with.mean() * 100) if len(emoji_engagement_with) > 0 else 0
+        avg_engagement_without_emojis = float(emoji_engagement_without.mean() * 100) if len(emoji_engagement_without) > 0 else 0
         
         # Top performing shorts (by views)
         top_shorts = df.nlargest(5, 'view_count')[['title', 'view_count', 'like_count', 'comment_count']].to_dict('records')
         
-        # Prepare scatter plot data
+        # Sentiment analysis
+        sentiment_stats = df.groupby('sentiment')['like_count'].mean().to_dict()
+        
+        # Posting schedule (day of week)
+        posting_schedule = df['day_of_week'].value_counts().to_dict()
+        
+        # Prepare scatter plot data (duration vs engagement rate)
         scatter_data = {
-            'caps_vs_views': df[['caps_percentage', 'view_count']].dropna().to_dict('records'),
-            'length_vs_views': df[['title_length', 'view_count']].dropna().to_dict('records')
+            'duration_vs_engagement': df[['duration_seconds', 'engagement_rate']].dropna().to_dict('records'),
         }
         
             # Prepare time series data for sparklines
@@ -578,6 +598,8 @@ def get_dashboard_data():
                 'avg_views': format_number(avg_views),
                 'avg_likes': format_number(avg_likes),
                 'avg_comments': format_number(avg_comments),
+                'avg_words': round(avg_words, 2),
+                'avg_shorts_per_day': round(avg_shorts_per_day, 1),
                 'avg_views_raw': avg_views,
                 'avg_likes_raw': avg_likes,
                 'avg_comments_raw': avg_comments
@@ -585,13 +607,19 @@ def get_dashboard_data():
             'hashtag_stats': {
                 'usage_percentage': round(hashtag_usage_percentage, 1),
                 'non_usage_percentage': round(100 - hashtag_usage_percentage, 1),
-                'avg_hashtags_per_video': round(avg_hashtags_per_video, 1)
+                'avg_hashtags_per_video': round(avg_hashtags_per_video, 1),
+                'engagement_with': round(avg_engagement_with_hashtags, 1),
+                'engagement_without': round(avg_engagement_without_hashtags, 1)
             },
             'emoji_stats': {
                 'usage_percentage': round(emoji_usage_percentage, 1),
                 'non_usage_percentage': round(100 - emoji_usage_percentage, 1),
-                'avg_emojis_per_video': round(avg_emojis_per_video, 1)
+                'avg_emojis_per_video': round(avg_emojis_per_video, 1),
+                'engagement_with': round(avg_engagement_with_emojis, 1),
+                'engagement_without': round(avg_engagement_without_emojis, 1)
             },
+            'sentiment_stats': sentiment_stats,
+            'posting_schedule': posting_schedule,
             'top_shorts': top_shorts,
             'scatter_data': scatter_data,
             'time_series_data': time_series_data

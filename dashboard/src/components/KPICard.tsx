@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BarChart from "./BarChart";
+import AreaChart from "./AreaChart";
 import "./KPICard.css";
 
 interface KPICardProps {
@@ -40,7 +40,7 @@ const KPICard: React.FC<KPICardProps> = ({
       </div>
       {timeSeriesData && timeSeriesData.length > 0 ? (
         <div className="kpi-chart-container">
-          <BarChart
+          <AreaChart
             data={timeSeriesData}
             width={240}
             height={80}

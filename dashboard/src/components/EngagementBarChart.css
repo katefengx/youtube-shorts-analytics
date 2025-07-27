@@ -1,0 +1,58 @@
+.engagement-bar-chart_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 10px;
+}
+
+.engagement-bar-chart_title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.engagement-bar-chart_bars {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-end;
+  height: 120px;
+}
+
+.engagement-bar-chart_bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.engagement-bar-chart_percentage {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.engagement-bar-chart_bar {
+  width: 40px;
+  min-height: 20px;
+  border-radius: 4px;
+  transition: height 0.3s ease;
+}
+
+.engagement-bar-chart_bar.with-feature {
+  background-color: #e78383;
+}
+
+.engagement-bar-chart_bar.without-feature {
+  background-color: #ddd;
+}
+
+.engagement-bar-chart_label {
+  font-size: 0.75rem;
+  color: #666;
+  text-align: center;
+  font-weight: 500;
+}
