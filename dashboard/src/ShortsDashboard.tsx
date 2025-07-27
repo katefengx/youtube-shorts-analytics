@@ -6,6 +6,7 @@ import EngagementBarChart from "./components/EngagementBarChart";
 import TimeFilter from "./components/TimeFilter";
 import AreaChart from "./components/AreaChart";
 import TopPerformingShorts from "./components/TopPerformingShorts";
+import ScatterPlot from "./components/ScatterPlot";
 
 const ShortsDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
@@ -333,6 +334,23 @@ const ShortsDashboard: React.FC = () => {
 
         {/* Top Performing Shorts */}
         <TopPerformingShorts topShorts={filteredData.top_shorts} />
+
+        {/* Scatter Plot */}
+        <ScatterPlot
+          data={filteredData.scatter_data.duration_vs_engagement}
+          width={600}
+          height={400}
+          margin={{ top: 20, right: 20, bottom: 40, left: 50 }}
+          onHoverPoint={(point) => {
+            if (point) {
+              console.log(
+                `Hovered point - Duration: ${point.duration}, Engagement: ${point.engagement}`,
+              );
+            } else {
+              console.log("Hover cleared");
+            }
+          }}
+        />
 
         {/* Sentiment Section */}
         <div className="sentiment-section">

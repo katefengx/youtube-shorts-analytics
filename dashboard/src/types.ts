@@ -65,10 +65,6 @@ export interface DashboardData {
       duration_seconds: number;
       engagement_rate: number;
     }>;
-    words_vs_views: Array<{
-      num_words: number;
-      view_count: number;
-    }>;
   };
   time_series_data: {
     views: Array<{

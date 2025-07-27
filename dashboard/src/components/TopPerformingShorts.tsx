@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import "./TopPerformingShorts.css";
 
-export type SortType = "likes" | "views" | "comments";
+export type SortType = "view" | "like" | "comment";
 
 interface TopShort {
   title: string;
@@ -17,7 +17,7 @@ interface TopPerformingShortsProps {
 const TopPerformingShorts: React.FC<TopPerformingShortsProps> = ({
   topShorts,
 }) => {
-  const [sortBy, setSortBy] = useState<SortType>("likes");
+  const [sortBy, setSortBy] = useState<SortType>("view");
 
   // Safety check for empty or undefined data
   if (!topShorts || topShorts.length === 0) {
@@ -81,20 +81,20 @@ const TopPerformingShorts: React.FC<TopPerformingShortsProps> = ({
           <span className="sort-label">SORT BY</span>
           <div className="sort-buttons">
             <button
-              className={`sort-button ${sortBy === "likes" ? "active" : ""}`}
-              onClick={() => setSortBy("likes")}
-            >
-              LIKES
-            </button>
-            <button
-              className={`sort-button ${sortBy === "views" ? "active" : ""}`}
-              onClick={() => setSortBy("views")}
+              className={`sort-button ${sortBy === "view" ? "active" : ""}`}
+              onClick={() => setSortBy("view")}
             >
               VIEWS
             </button>
             <button
-              className={`sort-button ${sortBy === "comments" ? "active" : ""}`}
-              onClick={() => setSortBy("comments")}
+              className={`sort-button ${sortBy === "like" ? "active" : ""}`}
+              onClick={() => setSortBy("like")}
+            >
+              LIKES
+            </button>
+            <button
+              className={`sort-button ${sortBy === "comment" ? "active" : ""}`}
+              onClick={() => setSortBy("comment")}
             >
               COMMENTS
             </button>
