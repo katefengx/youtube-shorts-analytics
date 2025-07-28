@@ -6,7 +6,7 @@ const config = {
   },
   // Production: deployed backend (you'll need to update this URL)
   production: {
-    apiBaseUrl: "https://your-backend-url.com", // Update this with your actual backend URL
+    apiBaseUrl: "https://web-production-3ce0.up.railway.app", // Update this with your actual backend URL
   },
 };
 
