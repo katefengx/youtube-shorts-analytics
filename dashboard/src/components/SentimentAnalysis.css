@@ -1,0 +1,132 @@
+.sentiment-analysis {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.sentiment-header h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.sentiment-subtitle {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.sentiment-summary {
+  margin-bottom: 1.5rem;
+}
+
+.dominant-sentiment {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dominant-label {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.dominant-value {
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+
+.dominant-value.positive {
+  background-color: #e8f5e8;
+  color: #2d5a2d;
+}
+
+.dominant-value.neutral {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.dominant-value.negative {
+  background-color: #ffe8e8;
+  color: #8b2d2d;
+}
+
+.sentiment-breakdown {
+  margin-bottom: 1.5rem;
+}
+
+.sentiment-bar {
+  display: flex;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.sentiment-segment {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  position: relative;
+  min-width: 60px;
+}
+
+.sentiment-segment.positive {
+  background-color: #4caf50;
+}
+
+.sentiment-segment.neutral {
+  background-color: #9e9e9e;
+}
+
+.sentiment-segment.negative {
+  background-color: #f44336;
+}
+
+.sentiment-label {
+  font-size: 0.625rem;
+  margin-bottom: 0.125rem;
+}
+
+.sentiment-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.sentiment-percentages {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.percentage-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.percentage-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.percentage-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

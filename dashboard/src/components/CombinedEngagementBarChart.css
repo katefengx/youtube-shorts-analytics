@@ -1,0 +1,77 @@
+.combined-engagement-chart {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding: 1rem;
+}
+
+.chart-header {
+  text-align: center;
+}
+
+.chart-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+}
+
+.chart-header h5 {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+}
+
+.bars-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.bar-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.bar {
+  width: 50%;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s ease;
+  position: relative;
+}
+
+.bar.with-feature {
+  background-color: #e78383;
+}
+
+.bar.without-feature {
+  background-color: #ddd;
+}
+
+.bar-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-align: center;
+  font-weight: 400;
+}

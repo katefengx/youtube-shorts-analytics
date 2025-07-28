@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import type { DashboardData } from "./types";
 import "./ShortsDashboard.css";
 import DonutChart from "./components/DonutChart";
-import EngagementBarChart from "./components/EngagementBarChart";
+import CombinedEngagementBarChart from "./components/CombinedEngagementBarChart";
 import TimeFilter from "./components/TimeFilter";
 import AreaChart from "./components/AreaChart";
 import TopPerformingShorts from "./components/TopPerformingShorts";
 import ScatterPlot from "./components/ScatterPlot";
+import SentimentAnalysis from "./components/SentimentAnalysis";
+import PostingSchedule from "./components/PostingSchedule";
 
 const ShortsDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
@@ -281,227 +283,73 @@ const ShortsDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* Hashtag Section */}
-          <div className="engagement-section">
-            <div className="engagement-charts">
-              <DonutChart
-                usage_percentage={filteredData.hashtag_stats.usage_percentage}
-                non_usage_percentage={
-                  filteredData.hashtag_stats.non_usage_percentage
-                }
-                label={`USE`}
-                icon={<span>#</span>}
-                title="hashtags"
-                description={`${filteredData.hashtag_stats.avg_hashtags_per_video} hashtags per Short with hashtags`}
-                onFilterChange={handleFilterChange}
-              />
-              <EngagementBarChart
-                withFeaturePercentage={
-                  filteredData.hashtag_stats.engagement_with
-                }
-                withoutFeaturePercentage={
-                  filteredData.hashtag_stats.engagement_without
-                }
-                featureName="hashtags"
-              />
-            </div>
+          {/* Donut Charts Stacked */}
+          <div className="donut-charts-stacked">
+            <DonutChart
+              usage_percentage={filteredData.hashtag_stats.usage_percentage}
+              non_usage_percentage={
+                filteredData.hashtag_stats.non_usage_percentage
+              }
+              label={`USE`}
+              icon={<span>#</span>}
+              title="hashtags"
+              description={`${filteredData.hashtag_stats.avg_hashtags_per_video} hashtags per Short with hashtags`}
+              onFilterChange={handleFilterChange}
+            />
+            <DonutChart
+              usage_percentage={filteredData.emoji_stats.usage_percentage}
+              non_usage_percentage={
+                filteredData.emoji_stats.non_usage_percentage
+              }
+              label={`USE`}
+              icon={<span>😀</span>}
+              title="emojis"
+              description={`${filteredData.emoji_stats.avg_emojis_per_video} emojis per Short with emojis`}
+              onFilterChange={handleFilterChange}
+            />
           </div>
 
-          {/* Emoji Section */}
-          <div className="engagement-section">
-            <div className="engagement-charts">
-              <DonutChart
-                usage_percentage={filteredData.emoji_stats.usage_percentage}
-                non_usage_percentage={
-                  filteredData.emoji_stats.non_usage_percentage
-                }
-                label={`USE`}
-                icon={<span>😀</span>}
-                title="emojis"
-                description={`${filteredData.emoji_stats.avg_emojis_per_video} emojis per Short with emojis`}
-                onFilterChange={handleFilterChange}
-              />
-              <EngagementBarChart
-                withFeaturePercentage={filteredData.emoji_stats.engagement_with}
-                withoutFeaturePercentage={
-                  filteredData.emoji_stats.engagement_without
-                }
-                featureName="emojis"
-              />
-            </div>
+          {/* Combined Bar Chart */}
+          <div className="combined-bar-chart">
+            <CombinedEngagementBarChart
+              hashtagData={{
+                withFeature: filteredData.hashtag_stats.avg_views_with,
+                withoutFeature: filteredData.hashtag_stats.avg_views_without,
+              }}
+              emojiData={{
+                withFeature: filteredData.emoji_stats.avg_views_with,
+                withoutFeature: filteredData.emoji_stats.avg_views_without,
+              }}
+            />
           </div>
         </div>
 
         {/* Top Performing Shorts */}
-        <TopPerformingShorts topShorts={filteredData.top_shorts} />
+        <div className="top-shorts-section">
+          <TopPerformingShorts topShorts={filteredData.top_shorts} />
+        </div>
 
         {/* Scatter Plot */}
-        <ScatterPlot
-          data={filteredData.scatter_data.duration_vs_engagement}
-          width={600}
-          height={400}
-          margin={{ top: 20, right: 20, bottom: 40, left: 50 }}
-          onHoverPoint={(point) => {
-            if (point) {
-              console.log(
-                `Hovered point - Duration: ${point.duration}, Engagement: ${point.engagement}`,
-              );
-            } else {
-              console.log("Hover cleared");
-            }
-          }}
-        />
-
-        {/* Sentiment Section */}
-        <div className="sentiment-section">
-          <div className="section-title">SENTIMENT ANALYSIS</div>
-          <div className="section-subtitle">
-            avg. likes across caption sentiments (TextBlob)
-          </div>
-          <div className="sentiment-chart">
-            {/* Placeholder for sentiment bar chart */}
-            <div
-              style={{
-                height: "150px",
-                display: "flex",
-                alignItems: "end",
-                gap: "1rem",
-              }}
-            >
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: "#ddd",
-                  height: "60%",
-                  borderRadius: "4px",
-                }}
-              ></div>
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: "#ddd",
-                  height: "100%",
-                  borderRadius: "4px",
-                }}
-              ></div>
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: "#ddd",
-                  height: "40%",
-                  borderRadius: "4px",
-                }}
-              ></div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: "0.5rem",
-              }}
-            >
-              <span style={{ fontSize: "0.75rem", color: "#666" }}>
-                NEGATIVE
-              </span>
-              <span style={{ fontSize: "0.75rem", color: "#666" }}>
-                NEUTRAL
-              </span>
-              <span style={{ fontSize: "0.75rem", color: "#666" }}>
-                POSITIVE
-              </span>
-            </div>
-          </div>
-
-          <div className="section-title" style={{ marginTop: "2rem" }}>
-            POSTING SCHEDULE
-          </div>
-          <div className="section-subtitle">
-            how many Shorts are posted each day
-          </div>
-          <div className="posting-schedule-chart">
-            {/* Placeholder for posting schedule bar chart */}
-            <div
-              style={{
-                height: "120px",
-                display: "flex",
-                alignItems: "end",
-                gap: "0.5rem",
-              }}
-            >
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: "#ddd",
-                  height: "80%",
-                  borderRadius: "4px",
-                }}
-              ></div>
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: "#ddd",
-                  height: "90%",
-                  borderRadius: "4px",
-                }}
-              ></div>
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: "#ddd",
-                  height: "70%",
-                  borderRadius: "4px",
-                }}
-              ></div>
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: "#ff6b6b",
-                  height: "100%",
-                  borderRadius: "4px",
-                }}
-              ></div>
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: "#ddd",
-                  height: "60%",
-                  borderRadius: "4px",
-                }}
-              ></div>
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: "#ddd",
-                  height: "50%",
-                  borderRadius: "4px",
-                }}
-              ></div>
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: "#ddd",
-                  height: "40%",
-                  borderRadius: "4px",
-                }}
-              ></div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: "0.5rem",
-              }}
-            >
-              <span style={{ fontSize: "0.75rem", color: "#666" }}>M</span>
-              <span style={{ fontSize: "0.75rem", color: "#666" }}>T</span>
-              <span style={{ fontSize: "0.75rem", color: "#666" }}>W</span>
-              <span style={{ fontSize: "0.75rem", color: "#666" }}>T</span>
-              <span style={{ fontSize: "0.75rem", color: "#666" }}>F</span>
-              <span style={{ fontSize: "0.75rem", color: "#666" }}>S</span>
-              <span style={{ fontSize: "0.75rem", color: "#666" }}>S</span>
-            </div>
-          </div>
+        <div className="scatter-section">
+          <ScatterPlot
+            data={filteredData.scatter_data.duration_vs_engagement}
+            onHoverPoint={(point) => {
+              if (point) {
+                console.log(
+                  `Hovered point - Duration: ${point.duration}, Engagement: ${point.engagement}`,
+                );
+              } else {
+                console.log("Hover cleared");
+              }
+            }}
+          />
         </div>
+
+        {/* Sentiment Analysis Component */}
+        <SentimentAnalysis sentimentStats={filteredData.sentiment_stats} />
+
+        {/* Posting Schedule Component */}
+        <PostingSchedule postingSchedule={filteredData.posting_schedule} />
       </div>
     </div>
   );

@@ -3,12 +3,17 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  margin: 0 10px;
+  padding: 0.5rem;
+}
+
+.donut-pie-chart {
+  width: 200px;
+  height: 200px;
 }
 
 .donut-chart_label {
   position: absolute;
-  top: 40%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -24,13 +29,28 @@
 }
 
 .donut-chart_text {
-  font-size: 1.1em;
+  font-size: 0.8em;
   font-weight: bold;
 }
 
 .donut-chart_description {
   color: #888;
-  font-size: 0.9em;
+  font-size: 0.7em;
   margin-top: 8px;
+  text-align: center;
+}
+
+.donut-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.donut-instruction {
+  font-size: 0.8rem;
+  color: #ff6b6b;
+  font-weight: 500;
+  padding: 0.5rem;
   text-align: center;
 }

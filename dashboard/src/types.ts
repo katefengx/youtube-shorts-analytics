@@ -38,15 +38,15 @@ export interface DashboardData {
     usage_percentage: number;
     non_usage_percentage: number;
     avg_hashtags_per_video: number;
-    engagement_with: number;
-    engagement_without: number;
+    avg_views_with: number;
+    avg_views_without: number;
   };
   emoji_stats: {
     usage_percentage: number;
     non_usage_percentage: number;
     avg_emojis_per_video: number;
-    engagement_with: number;
-    engagement_without: number;
+    avg_views_with: number;
+    avg_views_without: number;
   };
   sentiment_stats: {
     [key: string]: number;

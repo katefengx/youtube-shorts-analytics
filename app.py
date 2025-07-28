@@ -523,13 +523,13 @@ def get_dashboard_data():
         hashtag_usage_percentage = (len(shorts_with_hashtags) / total_shorts) * 100 if total_shorts > 0 else 0
         avg_hashtags_per_video = float(shorts_with_hashtags['hashtag_count'].mean()) if len(shorts_with_hashtags) > 0 else 0
         
-        # Hashtag engagement rates
+        # Hashtag average views
         # Handle NaN and infinite values
-        hashtag_engagement_with = shorts_with_hashtags['engagement_rate'].replace([np.inf, -np.inf], np.nan).dropna()
-        hashtag_engagement_without = shorts_without_hashtags['engagement_rate'].replace([np.inf, -np.inf], np.nan).dropna()
+        hashtag_views_with = shorts_with_hashtags['view_count'].replace([np.inf, -np.inf], np.nan).dropna()
+        hashtag_views_without = shorts_without_hashtags['view_count'].replace([np.inf, -np.inf], np.nan).dropna()
         
-        avg_engagement_with_hashtags = float(hashtag_engagement_with.mean() * 100) if len(hashtag_engagement_with) > 0 else 0
-        avg_engagement_without_hashtags = float(hashtag_engagement_without.mean() * 100) if len(hashtag_engagement_without) > 0 else 0
+        avg_views_with_hashtags = float(hashtag_views_with.mean()) if len(hashtag_views_with) > 0 else 0
+        avg_views_without_hashtags = float(hashtag_views_without.mean()) if len(hashtag_views_without) > 0 else 0
         
         # Emoji statistics
         shorts_with_emojis = df[df['has_emojis'] == True]
@@ -537,19 +537,19 @@ def get_dashboard_data():
         emoji_usage_percentage = (len(shorts_with_emojis) / total_shorts) * 100 if total_shorts > 0 else 0
         avg_emojis_per_video = float(shorts_with_emojis['emoji_count'].mean()) if len(shorts_with_emojis) > 0 else 0
         
-        # Emoji engagement rates
+        # Emoji average views
         # Handle NaN and infinite values
-        emoji_engagement_with = shorts_with_emojis['engagement_rate'].replace([np.inf, -np.inf], np.nan).dropna()
-        emoji_engagement_without = shorts_without_emojis['engagement_rate'].replace([np.inf, -np.inf], np.nan).dropna()
+        emoji_views_with = shorts_with_emojis['view_count'].replace([np.inf, -np.inf], np.nan).dropna()
+        emoji_views_without = shorts_without_emojis['view_count'].replace([np.inf, -np.inf], np.nan).dropna()
         
-        avg_engagement_with_emojis = float(emoji_engagement_with.mean() * 100) if len(emoji_engagement_with) > 0 else 0
-        avg_engagement_without_emojis = float(emoji_engagement_without.mean() * 100) if len(emoji_engagement_without) > 0 else 0
+        avg_views_with_emojis = float(emoji_views_with.mean()) if len(emoji_views_with) > 0 else 0
+        avg_views_without_emojis = float(emoji_views_without.mean()) if len(emoji_views_without) > 0 else 0
         
         # Top performing shorts (by views)
         top_shorts = df.nlargest(5, 'view_count')[['title', 'view_count', 'like_count', 'comment_count']].to_dict('records')
         
         # Sentiment analysis
-        sentiment_stats = df.groupby('sentiment')['like_count'].mean().to_dict()
+        sentiment_stats = df['sentiment'].value_counts().to_dict()
         
         # Posting schedule (day of week)
         posting_schedule = df['day_of_week'].value_counts().to_dict()
@@ -608,15 +608,15 @@ def get_dashboard_data():
                 'usage_percentage': round(hashtag_usage_percentage, 1),
                 'non_usage_percentage': round(100 - hashtag_usage_percentage, 1),
                 'avg_hashtags_per_video': round(avg_hashtags_per_video, 1),
-                'engagement_with': round(avg_engagement_with_hashtags, 1),
-                'engagement_without': round(avg_engagement_without_hashtags, 1)
+                'avg_views_with': round(avg_views_with_hashtags, 1),
+                'avg_views_without': round(avg_views_without_hashtags, 1)
             },
             'emoji_stats': {
                 'usage_percentage': round(emoji_usage_percentage, 1),
                 'non_usage_percentage': round(100 - emoji_usage_percentage, 1),
                 'avg_emojis_per_video': round(avg_emojis_per_video, 1),
-                'engagement_with': round(avg_engagement_with_emojis, 1),
-                'engagement_without': round(avg_engagement_without_emojis, 1)
+                'avg_views_with': round(avg_views_with_emojis, 1),
+                'avg_views_without': round(avg_views_without_emojis, 1)
             },
             'sentiment_stats': sentiment_stats,
             'posting_schedule': posting_schedule,

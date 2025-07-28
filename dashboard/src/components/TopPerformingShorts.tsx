@@ -24,7 +24,10 @@ const TopPerformingShorts: React.FC<TopPerformingShortsProps> = ({
     return (
       <div className="top-performing-shorts">
         <div className="top-performing-shorts-header">
-          <h2 className="top-performing-shorts-title">TOP PERFORMING SHORTS</h2>
+          <h3>TOP PERFORMING SHORTS</h3>
+          <p className="top-performing-shorts-subtitle">
+            your best performing Shorts by engagement
+          </p>
         </div>
         <div className="shorts-list">
           <div className="short-item">
@@ -76,7 +79,10 @@ const TopPerformingShorts: React.FC<TopPerformingShortsProps> = ({
   return (
     <div className="top-performing-shorts">
       <div className="top-performing-shorts-header">
-        <h2 className="top-performing-shorts-title">TOP PERFORMING SHORTS</h2>
+        <h3>TOP PERFORMING SHORTS</h3>
+        <p className="top-performing-shorts-subtitle">
+          your best performing Shorts by engagement
+        </p>
         <div className="sort-controls">
           <span className="sort-label">SORT BY</span>
           <div className="sort-buttons">
@@ -105,7 +111,11 @@ const TopPerformingShorts: React.FC<TopPerformingShortsProps> = ({
       <div className="shorts-list">
         {sortedShorts.map((short, index) => {
           const value = getSortValue(short);
-          const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+          // Calculate percentage based on position (1st = 100%, 2nd = 80%, 3rd = 60%, etc.)
+          const percentage =
+            sortedShorts.length > 0
+              ? ((sortedShorts.length - index) / sortedShorts.length) * 100
+              : 0;
 
           return (
             <div key={index} className="short-item">

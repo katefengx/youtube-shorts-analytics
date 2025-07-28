@@ -1,0 +1,126 @@
+.posting-schedule {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.schedule-header h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.schedule-subtitle {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.schedule-summary {
+  margin-bottom: 1.5rem;
+}
+
+.most-active-day {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.active-label {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.active-value {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+}
+
+.schedule-chart {
+  margin-bottom: 1.5rem;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+  height: 120px;
+  margin-bottom: 0.5rem;
+}
+
+.chart-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+}
+
+.chart-bar {
+  width: 100%;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 8px;
+  transition: all 0.3s ease;
+}
+
+.chart-bar.most-active {
+  background-color: #ff6b6b;
+}
+
+.chart-bar:hover {
+  opacity: 0.8;
+  transform: scaleY(1.05);
+}
+
+.bar-count {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.day-label {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.schedule-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-align: center;
+  line-height: 1.2;
+}
