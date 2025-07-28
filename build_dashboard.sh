@@ -24,10 +24,10 @@ echo "CSS Bundle: $CSS_BUNDLE"
 sed -i '' "s|script\[src\*=\"index-[^\"]*\.js\"\]|script[src*=\"$JS_BUNDLE\"]|g" static/index.html
 
 # Update the JavaScript bundle reference in the script src
-sed -i '' "s|script.src = \"/static/dashboard/assets/index-[^\"]*\.js\"|script.src = \"/static/dashboard/assets/$JS_BUNDLE\"|g" static/index.html
+sed -i '' "s|script.src = \"/static/dashboard/assets/index-[^\"]*\.js\"|script.src = \"/dashboard/assets/$JS_BUNDLE\"|g" static/index.html
 
 # Update the CSS bundle reference
-sed -i '' "s|cssLink.href = \"/static/dashboard/assets/index-[^\"]*\.css\"|cssLink.href = \"/static/dashboard/assets/$CSS_BUNDLE\"|g" static/index.html
+sed -i '' "s|cssLink.href = \"/static/dashboard/assets/index-[^\"]*\.css\"|cssLink.href = \"/dashboard/assets/$CSS_BUNDLE\"|g" static/index.html
 
 echo "✅ Dashboard build complete!"
 echo "🎯 New bundles: $JS_BUNDLE, $CSS_BUNDLE" 
