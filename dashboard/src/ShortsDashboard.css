@@ -15,7 +15,7 @@ html {
   padding: 1rem;
   background: #fff0f0;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
 }
@@ -80,22 +80,31 @@ html {
 
 .dashboard-grid {
   display: grid;
-  grid-template-areas:
-    "engagement top-shorts sentiment"
-    "engagement scatter sentiment";
   grid-template-columns: 0.6fr 1.4fr 0.6fr;
-  grid-template-rows: 1fr 1fr;
   grid-gap: 1rem;
-  margin-top: 2rem;
-  min-height: 400px;
-  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.middle-column {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-row-gap: 1rem;
+}
+
+.right-column {
+  display: grid;
+  grid-template-rows: 1fr 3fr;
+  grid-row-gap: 1rem;
 }
 
 .engagement-analysis {
-  grid-area: engagement;
   background-color: #fff;
   border-radius: 16px;
-  padding: 0.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: none;
   display: flex;
@@ -107,43 +116,33 @@ html {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-bottom: 1rem;
 }
 
 .combined-bar-chart {
   flex: 1;
-  min-height: 100px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   height: 100%;
 }
 
-.engagement-charts {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-}
-
 .top-shorts-section {
-  grid-area: top-shorts;
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
   background-color: #fff;
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: none;
-  max-width: 100%;
   overflow: hidden;
-  min-height: 100%;
-  height: 100%;
 }
 
 .scatter-section {
-  grid-area: scatter;
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
   background-color: #fff;
   border-radius: 16px;
-  padding: 1rem;
+  padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: none;
   height: 100%;
@@ -162,36 +161,31 @@ html {
 .top-performing-shorts {
   background: transparent;
   border-radius: 0;
-  padding: 0;
   box-shadow: none;
   border: none;
-  height: 100%;
 }
 
 .sentiment-section {
-  grid-area: sentiment;
+  /* grid-area: sentiment; */
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
   background-color: #fff;
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: none;
+  height: 100%;
 }
 
-/* Section titles */
-.section-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.section-subtitle {
-  font-size: 0.875rem;
-  color: #666;
-  margin-bottom: 1.5rem;
-  font-style: italic;
+.posting-schedule-section {
+  /* grid-area: posting-schedule; */
+  grid-column: 3 / 4;
+  grid-row: 2 / 3;
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  height: 100%;
 }
 
 /* Performance metrics cards */
@@ -218,7 +212,7 @@ html {
   font-weight: 700;
   color: #ae3131;
   display: block;
-  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .metric-label {
@@ -252,6 +246,22 @@ html {
 
 /* Responsive design */
 @media (max-width: 768px) {
+  .dashboard-grid {
+    display: block;
+    margin-top: 1rem;
+  }
+  .engagement-analysis,
+  .top-shorts-section,
+  .scatter-section,
+  .sentiment-section,
+  .posting-schedule-section {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+  }
+
   .dashboard-header {
     flex-direction: column;
     gap: 1rem;

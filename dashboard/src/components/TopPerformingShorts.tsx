@@ -50,15 +50,6 @@ const TopPerformingShorts: React.FC<TopPerformingShortsProps> = ({
     return sorted;
   }, [topShorts, sortBy]);
 
-  const maxValue = useMemo(() => {
-    if (sortedShorts.length === 0) return 1;
-    return Math.max(
-      ...sortedShorts.map(
-        (short) => (short[`${sortBy}_count` as keyof TopShort] as number) || 0,
-      ),
-    );
-  }, [sortedShorts, sortBy]);
-
   const formatValue = (value: number | undefined): string => {
     if (value === undefined || value === null) {
       return "0";

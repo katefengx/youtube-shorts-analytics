@@ -204,10 +204,10 @@ const ShortsDashboard: React.FC = () => {
           {/* Performance Metrics */}
           <div className="performance-metrics">
             <div className="metric-card">
+              <span className="metric-label">AVG. VIEWS</span>
               <span className="metric-value">
                 {filteredData.summary.avg_views}
               </span>
-              <span className="metric-label">AVG. VIEWS</span>
               {filteredData.time_series_data?.views && (
                 <div className="metric-chart">
                   <AreaChart
@@ -222,10 +222,11 @@ const ShortsDashboard: React.FC = () => {
               )}
             </div>
             <div className="metric-card">
+              <span className="metric-label">AVG. LIKES</span>
               <span className="metric-value">
                 {filteredData.summary.avg_likes}
               </span>
-              <span className="metric-label">AVG. LIKES</span>
+
               {filteredData.time_series_data?.likes && (
                 <div className="metric-chart">
                   <AreaChart
@@ -240,10 +241,10 @@ const ShortsDashboard: React.FC = () => {
               )}
             </div>
             <div className="metric-card">
+              <span className="metric-label">AVG. COMMENTS</span>
               <span className="metric-value">
                 {filteredData.summary.avg_comments}
               </span>
-              <span className="metric-label">AVG. COMMENTS</span>
               {filteredData.time_series_data?.comments && (
                 <div className="metric-chart">
                   <AreaChart
@@ -284,72 +285,82 @@ const ShortsDashboard: React.FC = () => {
           </div>
 
           {/* Donut Charts Stacked */}
-          <div className="donut-charts-stacked">
-            <DonutChart
-              usage_percentage={filteredData.hashtag_stats.usage_percentage}
-              non_usage_percentage={
-                filteredData.hashtag_stats.non_usage_percentage
-              }
-              label={`USE`}
-              icon={<span>#</span>}
-              title="hashtags"
-              description={`${filteredData.hashtag_stats.avg_hashtags_per_video} hashtags per Short with hashtags`}
-              onFilterChange={handleFilterChange}
-            />
-            <DonutChart
-              usage_percentage={filteredData.emoji_stats.usage_percentage}
-              non_usage_percentage={
-                filteredData.emoji_stats.non_usage_percentage
-              }
-              label={`USE`}
-              icon={<span>😀</span>}
-              title="emojis"
-              description={`${filteredData.emoji_stats.avg_emojis_per_video} emojis per Short with emojis`}
-              onFilterChange={handleFilterChange}
-            />
+          <div className="middle-column">
+            <div className="donut-charts-stacked">
+              <DonutChart
+                usage_percentage={filteredData.hashtag_stats.usage_percentage}
+                non_usage_percentage={
+                  filteredData.hashtag_stats.non_usage_percentage
+                }
+                label={`USE`}
+                icon={<span>#</span>}
+                title="hashtags"
+                description={`${filteredData.hashtag_stats.avg_hashtags_per_video} hashtags per Short with hashtags`}
+                onFilterChange={handleFilterChange}
+              />
+              <DonutChart
+                usage_percentage={filteredData.emoji_stats.usage_percentage}
+                non_usage_percentage={
+                  filteredData.emoji_stats.non_usage_percentage
+                }
+                label={`USE`}
+                icon={<span>😀</span>}
+                title="emojis"
+                description={`${filteredData.emoji_stats.avg_emojis_per_video} emojis per Short with emojis`}
+                onFilterChange={handleFilterChange}
+              />
+            </div>
+
+            {/* Combined Bar Chart */}
+            <div className="combined-bar-chart">
+              <CombinedEngagementBarChart
+                hashtagData={{
+                  withFeature: filteredData.hashtag_stats.avg_views_with,
+                  withoutFeature: filteredData.hashtag_stats.avg_views_without,
+                }}
+                emojiData={{
+                  withFeature: filteredData.emoji_stats.avg_views_with,
+                  withoutFeature: filteredData.emoji_stats.avg_views_without,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="middle-column">
+          {/* Top Performing Shorts */}
+          <div className="top-shorts-section">
+            <TopPerformingShorts topShorts={filteredData.top_shorts} />
           </div>
 
-          {/* Combined Bar Chart */}
-          <div className="combined-bar-chart">
-            <CombinedEngagementBarChart
-              hashtagData={{
-                withFeature: filteredData.hashtag_stats.avg_views_with,
-                withoutFeature: filteredData.hashtag_stats.avg_views_without,
-              }}
-              emojiData={{
-                withFeature: filteredData.emoji_stats.avg_views_with,
-                withoutFeature: filteredData.emoji_stats.avg_views_without,
+          {/* Scatter Plot */}
+          <div className="scatter-section">
+            <ScatterPlot
+              data={filteredData.scatter_data.duration_vs_engagement}
+              onHoverPoint={(point) => {
+                if (point) {
+                  console.log(
+                    `Hovered point - Duration: ${point.duration}, Engagement: ${point.engagement}`,
+                  );
+                } else {
+                  console.log("Hover cleared");
+                }
               }}
             />
           </div>
         </div>
 
-        {/* Top Performing Shorts */}
-        <div className="top-shorts-section">
-          <TopPerformingShorts topShorts={filteredData.top_shorts} />
+        <div className="right-column">
+          {/* Sentiment Analysis Component */}
+          <div className="sentiment-section">
+            <SentimentAnalysis sentimentStats={filteredData.sentiment_stats} />
+          </div>
+
+          {/* Posting Schedule Component */}
+          <div className="posting-schedule-section">
+            <PostingSchedule postingSchedule={filteredData.posting_schedule} />
+          </div>
         </div>
-
-        {/* Scatter Plot */}
-        <div className="scatter-section">
-          <ScatterPlot
-            data={filteredData.scatter_data.duration_vs_engagement}
-            onHoverPoint={(point) => {
-              if (point) {
-                console.log(
-                  `Hovered point - Duration: ${point.duration}, Engagement: ${point.engagement}`,
-                );
-              } else {
-                console.log("Hover cleared");
-              }
-            }}
-          />
-        </div>
-
-        {/* Sentiment Analysis Component */}
-        <SentimentAnalysis sentimentStats={filteredData.sentiment_stats} />
-
-        {/* Posting Schedule Component */}
-        <PostingSchedule postingSchedule={filteredData.posting_schedule} />
       </div>
     </div>
   );

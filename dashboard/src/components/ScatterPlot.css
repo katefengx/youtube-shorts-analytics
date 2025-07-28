@@ -1,6 +1,5 @@
 .scatterplot-container {
   box-shadow: none;
-  margin-bottom: 1rem;
 }
 
 .scatterplot-header h3 {
@@ -14,11 +13,11 @@
   margin: 0 0 1rem 0;
   font-size: 0.875rem;
   color: #666;
-  font-weight: 400;
 }
 
 .scatterplot-note {
   font-size: 0.875rem;
+  font-weight: 500;
   color: #e78383;
   text-align: center;
   margin-top: 1rem;

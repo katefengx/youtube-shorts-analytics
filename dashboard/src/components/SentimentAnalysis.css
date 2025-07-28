@@ -1,9 +1,13 @@
 .sentiment-analysis {
-  background: white;
+  background: transparent;
   border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1.5rem;
+  padding: 0.5rem;
+}
+
+:root {
+  --positive-color: #ffa7a7;
+  --neutral-color: #d9d9d9;
+  --negative-color: #fc9595;
 }
 
 .sentiment-header h3 {
@@ -45,17 +49,14 @@
 
 .dominant-value.positive {
   background-color: #e8f5e8;
-  color: #2d5a2d;
 }
 
 .dominant-value.neutral {
   background-color: #f0f0f0;
-  color: #666;
 }
 
 .dominant-value.negative {
   background-color: #ffe8e8;
-  color: #8b2d2d;
 }
 
 .sentiment-breakdown {
@@ -83,15 +84,18 @@
 }
 
 .sentiment-segment.positive {
-  background-color: #4caf50;
+  background-color: var(--positive-color);
+  color: #666;
 }
 
 .sentiment-segment.neutral {
-  background-color: #9e9e9e;
+  background-color: var(--neutral-color);
+  color: #666;
 }
 
 .sentiment-segment.negative {
-  background-color: #f44336;
+  background-color: var(--negative-color);
+  color: #666;
 }
 
 .sentiment-label {
