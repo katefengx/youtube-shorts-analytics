@@ -18,7 +18,6 @@ yarn-error.log*
 
 # Build outputs
 dashboard/dist/
-static/dashboard/assets/
 
 # Large media files
 *.mp4
