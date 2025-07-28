@@ -285,11 +285,26 @@ def analyze_channel():
                 shutil.copy(processed_shorts_path, 'data/processed_shorts.csv')
                 
                 if is_channel_only:
-                    # Channel-only analysis - return just the processed data
+                    # Channel-only analysis - build dashboard and return data
+                    try:
+                        # Trigger React dashboard build
+                        print("DEBUG: Building React dashboard for user data...")
+                        build_result = subprocess.run(
+                            ['./build_dashboard.sh'], 
+                            check=True, 
+                            capture_output=True, 
+                            text=True,
+                            cwd=os.path.dirname(os.path.abspath(__file__))
+                        )
+                        print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
+                    except subprocess.CalledProcessError as e:
+                        print(f"DEBUG: Dashboard build failed: {e.stderr}")
+                        # Continue without dashboard build if it fails
+                    
                     response_data = {
                         'success': True,
                         'data': processed,
-                        'message': 'Channel analysis completed successfully'
+                        'message': 'Channel analysis completed successfully. Dashboard has been built.'
                     }
                     return jsonify(response_data)
                 else:
@@ -351,6 +366,21 @@ def analyze_channel():
                     shorts_by_day = shorts_by_day_df.to_dict('records')
                     sub_stats = sub_stats_df.to_dict('records')
                     
+                    # Build React dashboard after full analysis
+                    try:
+                        print("DEBUG: Building React dashboard for full analysis...")
+                        build_result = subprocess.run(
+                            ['./build_dashboard.sh'], 
+                            check=True, 
+                            capture_output=True, 
+                            text=True,
+                            cwd=os.path.dirname(os.path.abspath(__file__))
+                        )
+                        print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
+                    except subprocess.CalledProcessError as e:
+                        print(f"DEBUG: Dashboard build failed: {e.stderr}")
+                        # Continue without dashboard build if it fails
+                    
                     response_data = {
                         'success': True,
                         'data': processed,
@@ -358,7 +388,7 @@ def analyze_channel():
                         'attributions': attributions,
                         'shorts_by_day': shorts_by_day,
                         'sub_stats': sub_stats,
-                        'message': 'Analysis completed successfully'
+                        'message': 'Analysis completed successfully. Dashboard has been built.'
                     }
                     return jsonify(response_data)
         
@@ -397,11 +427,25 @@ def analyze_channel():
                 shutil.copy(processed_shorts_path, 'data/processed_shorts.csv')
                 
                 if is_channel_only:
-                    # Channel-only analysis - return just the processed data
+                    # Channel-only analysis - build dashboard and return data
+                    try:
+                        print("DEBUG: Building React dashboard for CSV mode channel-only analysis...")
+                        build_result = subprocess.run(
+                            ['./build_dashboard.sh'], 
+                            check=True, 
+                            capture_output=True, 
+                            text=True,
+                            cwd=os.path.dirname(os.path.abspath(__file__))
+                        )
+                        print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
+                    except subprocess.CalledProcessError as e:
+                        print(f"DEBUG: Dashboard build failed: {e.stderr}")
+                        # Continue without dashboard build if it fails
+                    
                     response_data = {
                         'success': True,
                         'data': processed,
-                        'message': 'Channel analysis completed successfully (CSV mode)'
+                        'message': 'Channel analysis completed successfully (CSV mode). Dashboard has been built.'
                     }
                     return jsonify(response_data)
                 else:
@@ -453,6 +497,21 @@ def analyze_channel():
                     print("DEBUG: processed['shorts_data'] length:", len(processed.get('shorts_data', [])))
                     print("DEBUG: processed['daily_data'] length:", len(processed.get('daily_data', [])))
                     
+                    # Build React dashboard after full CSV analysis
+                    try:
+                        print("DEBUG: Building React dashboard for CSV mode full analysis...")
+                        build_result = subprocess.run(
+                            ['./build_dashboard.sh'], 
+                            check=True, 
+                            capture_output=True, 
+                            text=True,
+                            cwd=os.path.dirname(os.path.abspath(__file__))
+                        )
+                        print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
+                    except subprocess.CalledProcessError as e:
+                        print(f"DEBUG: Dashboard build failed: {e.stderr}")
+                        # Continue without dashboard build if it fails
+                    
                     response_data = {
                         'success': True,
                         'data': processed,
@@ -460,7 +519,7 @@ def analyze_channel():
                         'attributions': attributions,
                         'shorts_by_day': shorts_by_day,
                         'sub_stats': sub_stats,
-                        'message': 'Analysis completed successfully (CSV mode)'
+                        'message': 'Analysis completed successfully (CSV mode). Dashboard has been built.'
                     }
                     
                     print("DEBUG: CSV MODE - Response data keys:", list(response_data.keys()))
