@@ -43,10 +43,12 @@ def serve_index():
 
 @app.route('/dashboard')
 def serve_dashboard():
+    print("DEBUG: Serving dashboard index.html")
     return send_from_directory('static/dashboard', 'index.html')
 
 @app.route('/dashboard/<path:path>')
 def serve_dashboard_static(path):
+    print(f"DEBUG: Serving dashboard asset: {path}")
     return send_from_directory('static/dashboard', path)
 
 @app.route('/<path:path>')
