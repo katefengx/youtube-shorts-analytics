@@ -15,7 +15,9 @@ This guide explains how to deploy your YouTube Shorts Analytics application to G
 1. Go to your GitHub repository
 2. Navigate to Settings > Pages
 3. Set Source to "GitHub Actions"
-4. The workflow will automatically deploy when you push to main
+4. The workflow will automatically deploy when you push to main branch
+
+**Note**: Since you've renamed your default branch to `main`, make sure your repository settings reflect this change.
 
 ### 2. Update Backend URL
 
@@ -38,10 +40,11 @@ git push origin main
 The GitHub Actions workflow will automatically:
 
 1. Build the React dashboard
-2. Copy static files to docs/
-3. Deploy to GitHub Pages
+2. Deploy to GitHub Pages using the new GitHub Pages deployment system
 
 Your site will be available at: `https://yourusername.github.io/your-repo-name/`
+
+**Note**: Since you've renamed your default branch to `main`, the workflow is configured to trigger on pushes to the `main` branch.
 
 ## Backend Deployment Options
 
@@ -54,30 +57,6 @@ Since your Flask backend needs to process YouTube API data, you have several dep
 3. Set environment variables:
    - `API_KEY`: Your YouTube API key
 4. Deploy
-
-### Option 2: Render
-
-1. Go to [render.com](https://render.com)
-2. Create a new Web Service
-3. Connect your repository
-4. Set build command: `pip install -r requirements.txt`
-5. Set start command: `python app.py`
-6. Add environment variables
-
-### Option 3: Heroku
-
-1. Create a `Procfile`:
-   ```
-   web: python app.py
-   ```
-2. Deploy using Heroku CLI or GitHub integration
-
-### Option 4: DigitalOcean App Platform
-
-1. Go to DigitalOcean App Platform
-2. Connect your repository
-3. Configure as a Python app
-4. Set environment variables
 
 ## Environment Variables
 
