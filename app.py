@@ -41,6 +41,14 @@ MOCK_USER_UPLOAD_PATH = 'data/mock_user_upload.csv'  # Mock user's uploaded subs
 def serve_index():
     return send_from_directory('static', 'index.html')
 
+@app.route('/dashboard')
+def serve_dashboard():
+    return send_from_directory('static/dashboard', 'index.html')
+
+@app.route('/dashboard/<path:path>')
+def serve_dashboard_static(path):
+    return send_from_directory('static/dashboard', path)
+
 @app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory('static', path)
@@ -639,14 +647,6 @@ def get_dashboard_data():
     except Exception as e:
         print(f"DEBUG: Error processing dashboard data: {str(e)}")
         return jsonify({'error': f'Failed to process dashboard data: {str(e)}'}), 500
-
-@app.route('/dashboard')
-def serve_dashboard():
-    return send_from_directory('static/dashboard', 'index.html')
-
-@app.route('/dashboard/<path:path>')
-def serve_dashboard_static(path):
-    return send_from_directory('static/dashboard', path)
 
 if __name__ == '__main__':
     # Use production settings for Railway deployment
