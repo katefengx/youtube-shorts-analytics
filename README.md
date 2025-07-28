@@ -4,7 +4,7 @@
 
 A comprehensive data science project that analyzes YouTube Shorts performance using machine learning techniques, statistical analysis, and interactive data visualization. This project demonstrates end-to-end data processing, from raw API data extraction to production-ready web application deployment.
 
-## 🎯 Project Overview
+## Project Overview
 
 This data science project demonstrates advanced analytics capabilities by analyzing YouTube Shorts performance data. The project showcases:
 
@@ -14,7 +14,7 @@ This data science project demonstrates advanced analytics capabilities by analyz
 - **Data Visualization**: Interactive dashboards with real-time data
 - **Full-Stack Development**: Production deployment with Flask backend and React frontend
 
-## 📊 Key Features & Analytics
+## Key Features & Analytics
 
 ### Advanced Data Processing
 
@@ -37,7 +37,7 @@ This data science project demonstrates advanced analytics capabilities by analyz
 - **Cloud Deployment**: Railway-based production deployment with custom domain
 - **Data Pipeline**: Automated data processing with pandas and numpy
 
-## 🔬 Data Science Methodology
+## Data Science Methodology
 
 ### Data Collection & Processing Pipeline
 
@@ -57,7 +57,7 @@ This data science project demonstrates advanced analytics capabilities by analyz
 - **Performance Prediction**: Statistical modeling of engagement patterns
 - **Content Optimization**: Analysis of optimal posting times and content strategies
 
-## 🛠️ Technical Architecture
+## Tech Stack
 
 ### Backend API (Flask)
 
@@ -79,7 +79,7 @@ This data science project demonstrates advanced analytics capabilities by analyz
 - **Real-time Processing**: On-demand data analysis for user-specific insights
 - **Scalable Architecture**: Modular design for easy feature additions
 
-## 🚀 Development & Deployment
+## Development & Deployment
 
 ### Local Development Setup
 
@@ -110,7 +110,7 @@ This data science project demonstrates advanced analytics capabilities by analyz
 - **CI/CD**: Automated deployment with Git integration
 - **Monitoring**: Real-time error tracking and performance monitoring
 
-## 📈 Data Sources & Analytics
+## Data Sources & Analytics
 
 ### YouTube Data API Integration
 
@@ -126,7 +126,7 @@ This data science project demonstrates advanced analytics capabilities by analyz
 - **Performance Benchmarking**: Comparative analysis across different content types
 - **Predictive Modeling**: Statistical patterns for content optimization
 
-## 🏗️ System Architecture
+## System Architecture
 
 ### Technology Stack
 
@@ -149,7 +149,7 @@ YouTube API → Flask Backend → Data Processing → React Dashboard → User I
 - **Visualization Engine**: Interactive charts and graphs
 - **Deployment Pipeline**: Automated CI/CD with Railway
 
-## 🧪 Quality Assurance & Testing
+## Quality Assurance & Testing
 
 ### Data Validation
 
