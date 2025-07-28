@@ -644,6 +644,10 @@ def get_dashboard_data():
 def serve_dashboard():
     return send_from_directory('static/dashboard', 'index.html')
 
+@app.route('/dashboard/<path:path>')
+def serve_dashboard_static(path):
+    return send_from_directory('static/dashboard', path)
+
 if __name__ == '__main__':
     # Use production settings for Railway deployment
     port = int(os.environ.get('PORT', 5001))

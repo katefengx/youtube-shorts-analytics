@@ -10,6 +10,7 @@ rm -f static/dashboard/index.html
 
 echo "📁 Copying new bundle files..."
 cp -r dashboard/dist/assets/* static/dashboard/assets/
+cp dashboard/dist/index.html static/dashboard/
 
 echo "🔍 Finding new bundle file names..."
 JS_BUNDLE=$(ls static/dashboard/assets/index-*.js | head -1 | xargs basename)
