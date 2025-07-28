@@ -41,6 +41,10 @@ MOCK_USER_UPLOAD_PATH = 'data/mock_user_upload.csv'  # Mock user's uploaded subs
 def serve_index():
     return send_from_directory('static', 'index.html')
 
+@app.route('/test')
+def test_route():
+    return jsonify({'status': 'Flask app is working', 'files': os.listdir('static/dashboard/assets')})
+
 @app.route('/dashboard')
 def serve_dashboard():
     print("DEBUG: Serving dashboard index.html")
