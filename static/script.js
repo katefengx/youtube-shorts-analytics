@@ -283,7 +283,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("csvFile", dummyCsv);
 
     // Make API call to backend
-    fetch("/api/analyze", {
+    fetch(`${API_BASE_URL}/api/analyze`, {
       method: "POST",
       body: formData,
     })
@@ -443,7 +443,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("csvFile", csvFile);
 
     // Make API call to backend
-    fetch("/api/analyze", {
+    fetch(`${API_BASE_URL}/api/analyze`, {
       method: "POST",
       body: formData,
     })

@@ -1,0 +1,12 @@
+# GitHub Pages configuration
+# This file tells GitHub Pages to serve the static files directly
+# without trying to process them with Jekyll
+
+# Disable Jekyll processing
+include: []
+exclude: []
+keep_files: [".git", ".gitignore", "README.md"]
+
+# Serve static files
+plugins:
+  - jekyll-relative-links

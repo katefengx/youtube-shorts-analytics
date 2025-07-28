@@ -16,7 +16,15 @@ import emoji
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+# Allow CORS from GitHub Pages and localhost
+CORS(app, origins=[
+    "http://localhost:3000",
+    "http://localhost:5001", 
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5001",
+    "https://*.github.io",  # Allow all GitHub Pages domains
+    "https://*.githubusercontent.com"  # Allow GitHub raw content
+])
 
 API_KEY = os.getenv('API_KEY')
 

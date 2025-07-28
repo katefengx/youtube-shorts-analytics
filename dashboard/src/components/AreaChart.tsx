@@ -106,7 +106,6 @@ const AreaChart: React.FC<AreaChartProps> = ({
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
 
     // Calculate which data point is being hovered
     const xStep = (width - 20) / (data.length - 1);

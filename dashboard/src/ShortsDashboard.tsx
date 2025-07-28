@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { DashboardData } from "./types";
+import { API_BASE_URL } from "./config";
 import "./ShortsDashboard.css";
 import DonutChart from "./components/DonutChart";
 import CombinedEngagementBarChart from "./components/CombinedEngagementBarChart";
@@ -27,7 +28,7 @@ const ShortsDashboard: React.FC = () => {
 
   // Fetch all available dates on mount
   useEffect(() => {
-    fetch("/api/shorts_data")
+    fetch(`${API_BASE_URL}/api/shorts_data`)
       .then((res) => res.json())
       .then((data) => {
         if (data.data && data.data.length > 0) {
@@ -52,7 +53,7 @@ const ShortsDashboard: React.FC = () => {
     const endDate = allDates[endIdx];
     setLoading(true);
     setError(null);
-    let url = `/api/dashboard_data?start_date=${startDate}&end_date=${endDate}`;
+    let url = `${API_BASE_URL}/api/dashboard_data?start_date=${startDate}&end_date=${endDate}`;
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
@@ -89,7 +90,7 @@ const ShortsDashboard: React.FC = () => {
     const startDate = allDates[startIdx];
     const endDate = allDates[endIdx];
 
-    let url = `/api/dashboard_data?start_date=${startDate}&end_date=${endDate}`;
+    let url = `${API_BASE_URL}/api/dashboard_data?start_date=${startDate}&end_date=${endDate}`;
 
     // Add filter parameters
     if (newFilters.hashtags !== undefined) {
@@ -124,7 +125,7 @@ const ShortsDashboard: React.FC = () => {
     const startDate = allDates[startIdx];
     const endDate = allDates[endIdx];
 
-    const url = `/api/dashboard_data?start_date=${startDate}&end_date=${endDate}`;
+    const url = `${API_BASE_URL}/api/dashboard_data?start_date=${startDate}&end_date=${endDate}`;
 
     fetch(url)
       .then((res) => res.json())
