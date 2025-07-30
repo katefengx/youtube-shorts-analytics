@@ -4,6 +4,29 @@
   align-items: center;
   position: relative;
   padding: 0.5rem;
+  height: 100%;
+}
+
+.donut-chart_title {
+  margin-bottom: 0.5rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.donut-chart_title h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.donut-chart_title p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 400;
 }
 
 .donut-pie-chart {

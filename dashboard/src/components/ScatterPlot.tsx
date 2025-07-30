@@ -18,8 +18,8 @@ interface ScatterPlotProps {
 
 const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, onHoverPoint }) => {
   const width = 700;
-  const height = 400;
-  const margin = { top: 30, right: 20, bottom: 50, left: 70 };
+  const height = 200;
+  const margin = { top: 15, right: 20, bottom: 30, left: 50 };
   const [hoverInfo, setHoverInfo] = useState<{
     duration: number;
     engagement: number;

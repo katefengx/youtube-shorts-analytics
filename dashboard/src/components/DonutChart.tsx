@@ -29,7 +29,11 @@ const DonutChart: React.FC<DonutChartProps> = ({
   ];
   return (
     <div className="donut-chart_container">
-      <PieChart width={200} height={200}>
+      <div className="donut-chart_title">
+        <h3>ENGAGEMENT FEATURES</h3>
+        <p>hashtag and emoji usage analysis</p>
+      </div>
+      <PieChart width={150} height={150}>
         <Tooltip
           formatter={(value, name) => [`${value}% ${name} ${title}`, null]}
           labelFormatter={() => ""}
@@ -45,8 +49,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
           nameKey="name"
           cx="50%"
           cy="50%"
-          innerRadius={50}
-          outerRadius={80}
+          innerRadius={35}
+          outerRadius={60}
           stroke="none"
           startAngle={90}
           endAngle={-270}

@@ -1,12 +1,12 @@
 // Configuration for API endpoints
 export const config = {
-  // Development: local Flask server
+  // Development: use Vite proxy (relative URL)
   development: {
-    apiBaseUrl: "http://localhost:5001",
+    apiBaseUrl: "",
   },
-  // Production: deployed backend (you'll need to update this URL)
+
   production: {
-    apiBaseUrl: "https://web-production-d6c78.up.railway.app", // Replace with your actual Railway URL
+    apiBaseUrl: "https://web-production-d6c78.up.railway.app",
   },
 };
 

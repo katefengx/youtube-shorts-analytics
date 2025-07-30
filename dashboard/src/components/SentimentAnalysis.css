@@ -12,20 +12,22 @@
 
 .sentiment-header h3 {
   margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .sentiment-subtitle {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1rem 0;
   font-size: 0.875rem;
   color: #666;
   font-weight: 400;
 }
 
 .sentiment-summary {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .dominant-sentiment {
@@ -60,15 +62,15 @@
 }
 
 .sentiment-breakdown {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .sentiment-bar {
   display: flex;
-  height: 40px;
+  height: 30px;
   border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .sentiment-segment {

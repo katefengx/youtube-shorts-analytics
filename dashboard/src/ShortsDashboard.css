@@ -15,9 +15,11 @@ html {
   padding: 1rem;
   background: #fff0f0;
   width: 100%;
-  height: 100%;
+  height: 900px;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  display: flex;
+  flex-direction: column;
 }
 
 .dashboard-header {
@@ -25,6 +27,7 @@ html {
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .header-content {
@@ -81,25 +84,31 @@ html {
 .dashboard-grid {
   display: grid;
   grid-template-columns: 0.6fr 1.4fr 0.6fr;
+  grid-template-rows: 1fr 1fr;
   grid-gap: 1rem;
   margin-top: 1.5rem;
+  flex: 1;
+  min-height: 0;
 }
 
 .left-column {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .middle-column {
   display: grid;
   grid-template-rows: 1fr 1fr;
   grid-row-gap: 1rem;
+  height: 100%;
 }
 
 .right-column {
   display: grid;
   grid-template-rows: 1fr 3fr;
   grid-row-gap: 1rem;
+  height: 100%;
 }
 
 .engagement-analysis {
@@ -135,6 +144,7 @@ html {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: none;
   overflow: hidden;
+  height: 100%;
 }
 
 .scatter-section {
@@ -163,6 +173,7 @@ html {
   border-radius: 0;
   box-shadow: none;
   border: none;
+  height: 100%;
 }
 
 .sentiment-section {
@@ -249,6 +260,7 @@ html {
   .dashboard-grid {
     display: block;
     margin-top: 1rem;
+    height: auto;
   }
   .engagement-analysis,
   .top-shorts-section,
