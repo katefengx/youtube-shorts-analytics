@@ -24,10 +24,35 @@ const TopPerformingShorts: React.FC<TopPerformingShortsProps> = ({
     return (
       <div className="top-performing-shorts">
         <div className="top-performing-shorts-header">
-          <h3>TOP PERFORMING SHORTS</h3>
-          <p className="top-performing-shorts-subtitle">
-            your best performing Shorts by engagement
-          </p>
+          <div className="header-left">
+            <h3>TOP PERFORMING SHORTS</h3>
+            <p className="top-performing-shorts-subtitle">
+              your best performing Shorts by engagement
+            </p>
+          </div>
+          <div className="sort-controls">
+            <span className="sort-label">SORT BY</span>
+            <div className="sort-buttons">
+              <button
+                className={`sort-button ${sortBy === "view" ? "active" : ""}`}
+                onClick={() => setSortBy("view")}
+              >
+                VIEWS
+              </button>
+              <button
+                className={`sort-button ${sortBy === "like" ? "active" : ""}`}
+                onClick={() => setSortBy("like")}
+              >
+                LIKES
+              </button>
+              <button
+                className={`sort-button ${sortBy === "comment" ? "active" : ""}`}
+                onClick={() => setSortBy("comment")}
+              >
+                COMMENTS
+              </button>
+            </div>
+          </div>
         </div>
         <div className="shorts-list">
           <div className="short-item">
@@ -67,13 +92,18 @@ const TopPerformingShorts: React.FC<TopPerformingShortsProps> = ({
     return value || 0;
   };
 
+  // Calculate the maximum value for percentage calculation
+  const maxValue = Math.max(...sortedShorts.map(getSortValue), 1);
+
   return (
     <div className="top-performing-shorts">
       <div className="top-performing-shorts-header">
-        <h3>TOP PERFORMING SHORTS</h3>
-        <p className="top-performing-shorts-subtitle">
-          your best performing Shorts by engagement
-        </p>
+        <div className="header-left">
+          <h3>TOP PERFORMING SHORTS</h3>
+          <p className="top-performing-shorts-subtitle">
+            your best performing Shorts by engagement
+          </p>
+        </div>
         <div className="sort-controls">
           <span className="sort-label">SORT BY</span>
           <div className="sort-buttons">
@@ -102,11 +132,8 @@ const TopPerformingShorts: React.FC<TopPerformingShortsProps> = ({
       <div className="shorts-list">
         {sortedShorts.map((short, index) => {
           const value = getSortValue(short);
-          // Calculate percentage based on position (1st = 100%, 2nd = 80%, 3rd = 60%, etc.)
-          const percentage =
-            sortedShorts.length > 0
-              ? ((sortedShorts.length - index) / sortedShorts.length) * 100
-              : 0;
+          // Calculate percentage based on actual value relative to max value
+          const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
 
           return (
             <div key={index} className="short-item">

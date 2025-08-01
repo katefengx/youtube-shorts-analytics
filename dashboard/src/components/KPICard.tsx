@@ -40,12 +40,7 @@ const KPICard: React.FC<KPICardProps> = ({
       </div>
       {timeSeriesData && timeSeriesData.length > 0 ? (
         <div className="kpi-chart-container">
-          <AreaChart
-            data={timeSeriesData}
-            width={240}
-            height={80}
-            onHoverData={handleHoverData}
-          />
+          <AreaChart data={timeSeriesData} onHoverData={handleHoverData} />
         </div>
       ) : null}
     </div>

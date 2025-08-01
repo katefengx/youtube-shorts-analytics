@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import type { DashboardData } from "./types";
 import { API_BASE_URL } from "./config";
 import "./ShortsDashboard.css";
-import DonutChart from "./components/DonutChart";
-import CombinedEngagementBarChart from "./components/CombinedEngagementBarChart";
+import DonutEngagement from "./components/DonutEngagement";
 import TimeFilter from "./components/TimeFilter";
 import AreaChart from "./components/AreaChart";
 import TopPerformingShorts from "./components/TopPerformingShorts";
@@ -216,8 +215,6 @@ const ShortsDashboard: React.FC = () => {
                       date: item.date,
                       value: item.view_count,
                     }))}
-                    width={120}
-                    height={40}
                   />
                 </div>
               )}
@@ -235,8 +232,6 @@ const ShortsDashboard: React.FC = () => {
                       date: item.date,
                       value: item.like_count,
                     }))}
-                    width={120}
-                    height={40}
                   />
                 </div>
               )}
@@ -255,8 +250,6 @@ const ShortsDashboard: React.FC = () => {
                         value: item.comment_count,
                       }),
                     )}
-                    width={120}
-                    height={40}
                   />
                 </div>
               )}
@@ -268,64 +261,18 @@ const ShortsDashboard: React.FC = () => {
       <div className="dashboard-grid">
         {/* Engagement Analysis */}
         <div className="engagement-analysis">
-          <div className="donut-header">
-            <div className="donut-instruction">
-              Click on sections in the charts to filter the dashboard by hashtag
-              and emoji use.
-            </div>
-            {(activeFilters.hashtags !== undefined ||
-              activeFilters.emojis !== undefined) && (
-              <button
-                className="reset-filters-btn"
-                onClick={resetFilters}
-                title="Reset all filters"
-              >
-                Reset Filters
-              </button>
-            )}
-          </div>
-
           {/* Donut Charts Stacked */}
-          <div className="middle-column">
-            <div className="donut-charts-stacked">
-              <DonutChart
-                usage_percentage={filteredData.hashtag_stats.usage_percentage}
-                non_usage_percentage={
-                  filteredData.hashtag_stats.non_usage_percentage
-                }
-                label={`USE`}
-                icon={<span>#</span>}
-                title="hashtags"
-                description={`${filteredData.hashtag_stats.avg_hashtags_per_video} hashtags per Short with hashtags`}
-                onFilterChange={handleFilterChange}
-              />
-              <DonutChart
-                usage_percentage={filteredData.emoji_stats.usage_percentage}
-                non_usage_percentage={
-                  filteredData.emoji_stats.non_usage_percentage
-                }
-                label={`USE`}
-                icon={<span>😀</span>}
-                title="emojis"
-                description={`${filteredData.emoji_stats.avg_emojis_per_video} emojis per Short with emojis`}
-                onFilterChange={handleFilterChange}
-              />
-            </div>
-
-            {/* Combined Bar Chart */}
-            <div className="combined-bar-chart">
-              <CombinedEngagementBarChart
-                hashtagData={{
-                  withFeature: filteredData.hashtag_stats.avg_views_with,
-                  withoutFeature: filteredData.hashtag_stats.avg_views_without,
-                }}
-                emojiData={{
-                  withFeature: filteredData.emoji_stats.avg_views_with,
-                  withoutFeature: filteredData.emoji_stats.avg_views_without,
-                }}
-              />
-            </div>
-          </div>
+          <DonutEngagement
+            hashtagData={filteredData.hashtag_stats}
+            emojiData={filteredData.emoji_stats}
+            activeFilters={{
+              hashtags: activeFilters.hashtags ?? false,
+              emojis: activeFilters.emojis ?? false,
+            }}
+            resetFilters={resetFilters}
+            onFilterChange={handleFilterChange}
+            filteredData={filteredData}
+          />
         </div>
 
         <div className="middle-column">

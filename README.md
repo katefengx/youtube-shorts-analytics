@@ -57,6 +57,22 @@ This data science project demonstrates advanced analytics capabilities by analyz
 - **Performance Prediction**: Statistical modeling of engagement patterns
 - **Content Optimization**: Analysis of optimal posting times and content strategies
 
+### Linear Regression Model
+
+- **Model Purpose**: Predict engagement rates using content features
+- **Feature Engineering**:
+  - Comments and likes as primary features
+  - 80/20 train-test split for model validation
+  - Target variable: Engaged views from YouTube Analytics Studio
+- **Model Performance**:
+  - Training Score: 0.9530978536341289 (95.31%)
+  - Test Score: 0.9647673761769311 (96.48%)
+- **Engagement Rate Calculation**:
+  - Weight for comments: 0.7842535737762139 (78.43%)
+  - Weight for likes: 0.21574642622378612 (21.57%)
+  - Formula: `(comment_count * w_comment + like_count * w_like) / view_count`
+- **Model Validation**: High R² scores indicate strong predictive power for engagement patterns
+
 ## Tech Stack
 
 ### Backend API (Flask)

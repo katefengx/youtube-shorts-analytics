@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import "./ScatterPlot.css";
 
 // define your data shape right here
@@ -17,13 +17,42 @@ interface ScatterPlotProps {
 }
 
 const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, onHoverPoint }) => {
-  const width = 700;
-  const height = 200;
-  const margin = { top: 15, right: 20, bottom: 30, left: 50 };
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  const margin = { top: 15, right: 20, bottom: 40, left: 60 };
   const [hoverInfo, setHoverInfo] = useState<{
     duration: number;
     engagement: number;
   } | null>(null);
+
+  // Update dimensions when container size changes
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
+
+        // Use container width, but maintain aspect ratio
+        const width = Math.max(containerWidth - 32, 300); // 32px for padding
+        const height = Math.min(containerHeight - 100, 350); // 100px for header and other elements
+
+        setDimensions({ width, height });
+      }
+    };
+
+    updateDimensions();
+
+    // Add resize listener
+    const resizeObserver = new ResizeObserver(updateDimensions);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   const handleHover = (
     point: { duration: number; engagement: number } | null,
@@ -32,8 +61,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, onHoverPoint }) => {
     onHoverPoint?.(point);
   };
 
-  const innerWidth = width - margin.left - margin.right;
-  const innerHeight = height - margin.top - margin.bottom;
+  const innerWidth = dimensions.width - margin.left - margin.right;
+  const innerHeight = dimensions.height - margin.top - margin.bottom;
 
   const xValues = useMemo(
     () => data.map((d: DataPoint) => d.duration_seconds),
@@ -61,8 +90,33 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, onHoverPoint }) => {
     [yMin, yMax, innerHeight],
   );
 
+  // Don't render SVG until we have actual dimensions
+  if (dimensions.width === 0 || dimensions.height === 0) {
+    return (
+      <div className="scatterplot-container" ref={containerRef}>
+        <div className="scatterplot-header">
+          <h3>ENGAGEMENT RATE vs. DURATION</h3>
+          <p className="scatterplot-subtitle">
+            how duration affects engagement
+          </p>
+        </div>
+        <div className="scatterplot-hover-info">Hover over a point</div>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="scatterplot-container">
+    <div className="scatterplot-container" ref={containerRef}>
       <div className="scatterplot-header">
         <h3>ENGAGEMENT RATE vs. DURATION</h3>
         <p className="scatterplot-subtitle">how duration affects engagement</p>
@@ -72,7 +126,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, onHoverPoint }) => {
           ? `Duration: ${hoverInfo.duration}s · Engagement: ${(hoverInfo.engagement * 100).toFixed(1)}%`
           : "Hover over a point"}
       </div>
-      <svg width={width} height={height}>
+      <svg width={dimensions.width} height={dimensions.height}>
         <g transform={`translate(${margin.left}, ${margin.top})`}>
           {/* X-axis line */}
           <line
@@ -100,7 +154,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, onHoverPoint }) => {
                 />
                 <text
                   x={x}
-                  y={innerHeight + 20}
+                  y={innerHeight + 15}
                   className="axis-tick-label"
                   textAnchor="middle"
                 >
@@ -118,7 +172,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, onHoverPoint }) => {
               <g key={`y-tick-${tick}`}>
                 <line x1={0} y1={y} x2={-5} y2={y} className="axis-tick" />
                 <text
-                  x={-15}
+                  x={-10}
                   y={y + 4}
                   className="axis-tick-label"
                   textAnchor="end"
@@ -149,7 +203,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, onHoverPoint }) => {
           <text
             className="axis-label"
             x={innerWidth / 2}
-            y={innerHeight + margin.bottom - 5}
+            y={innerHeight + 40}
             textAnchor="middle"
           >
             Duration (sec)
@@ -157,15 +211,22 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, onHoverPoint }) => {
 
           <text
             className="axis-label"
-            transform={`translate(${-margin.left + 20}, ${innerHeight / 2}) rotate(-90)`}
+            x={-15}
+            y={innerHeight / 2 - 30}
             textAnchor="middle"
+            transform={`rotate(-90, -15, ${innerHeight / 2})`}
           >
             Engagement Rate
           </text>
         </g>
       </svg>
       <div className="scatterplot-note">
-        Note: Engagement Rate is calculated as (Likes + Comments) ÷ Views
+        Note: Engagement Rate is calculated using a weighted sum of likes and
+        comments divided by views. The weights are derived from a linear
+        regression model predicting engaged views.
+      </div>
+      <div className="scatterplot-equation">
+        Formula: (0.78 × Comments + 0.22 × Likes) ÷ Views
       </div>
     </div>
   );

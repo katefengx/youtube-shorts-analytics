@@ -138,8 +138,10 @@ def filter_shorts(videos, details, max_seconds=60):
 
 # --- Analytics processing (from cleaning_data.ipynb) ---
 def process_analytics_data(shorts_path):
+    w_comment_norm = 0.7842535737762139 # see Mikayla_Stats_Pull in google colab
+    w_like_norm = 0.21574642622378612 # see Mikayla_Stats_Pull in google colab
     total_stats = pd.read_csv(shorts_path)
-    total_stats['engagement_rate'] = (total_stats['comment_count'] + total_stats['like_count']) / total_stats['view_count']
+    total_stats['engagement_rate'] = (total_stats['comment_count'] * w_comment_norm + total_stats['like_count'] * w_like_norm) / total_stats['view_count']
     total_stats['num_words'] = total_stats['title'].str.split().str.len()
     total_stats['published_at'] = pd.to_datetime(total_stats['published_at'], utc=True)
     total_stats['date'] = total_stats['published_at'].dt.date
