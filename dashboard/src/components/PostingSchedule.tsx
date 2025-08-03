@@ -36,6 +36,9 @@ const PostingSchedule: React.FC<PostingScheduleProps> = ({
     postingSchedule[a[0]] > postingSchedule[b[0]] ? a : b,
   )[0];
 
+  // Set a fixed maximum height for the bars (similar to engagement bars)
+  const maxHeight = 200;
+
   return (
     <div className="posting-schedule">
       <div className="schedule-header">
@@ -55,14 +58,15 @@ const PostingSchedule: React.FC<PostingScheduleProps> = ({
           {dayOrder.map((day, index) => {
             const count = postingSchedule[day] || 0;
             const percentage = total > 0 ? (count / total) * 100 : 0;
-            const height = maxCount > 0 ? (count / maxCount) * 100 : 0;
+            // Calculate height relative to the maximum count, similar to engagement bars
+            const height = maxCount > 0 ? (count / maxCount) * maxHeight : 0;
             const isMostActive = day === mostActiveDay;
 
             return (
               <div key={day} className="chart-column">
                 <div
                   className={`chart-bar ${isMostActive ? "most-active" : ""}`}
-                  style={{ height: `${height}%` }}
+                  style={{ height: `${height}px` }}
                   title={`${day}: ${count} Shorts (${percentage.toFixed(1)}%)`}
                 >
                   {count > 0 && <span className="bar-count">{count}</span>}
@@ -80,12 +84,8 @@ const PostingSchedule: React.FC<PostingScheduleProps> = ({
           <span className="stat-label">Total Shorts</span>
         </div>
         <div className="stat-item">
-          <span className="stat-value">{Math.round(total / 7)}</span>
-          <span className="stat-label">Avg per Day</span>
-        </div>
-        <div className="stat-item">
           <span className="stat-value">
-            {Object.keys(postingSchedule).length}
+            {dayOrder.filter((day) => (postingSchedule[day] || 0) > 0).length}
           </span>
           <span className="stat-label">Active Days</span>
         </div>

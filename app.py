@@ -636,6 +636,11 @@ def get_dashboard_data():
         
         # Posting schedule (day of week)
         posting_schedule = df['day_of_week'].value_counts().to_dict()
+        print(f"DEBUG: posting_schedule data: {posting_schedule}")
+        
+        # Average views per day of the week (success metric)
+        avg_views_per_day = df.groupby('day_of_week')['view_count'].mean().to_dict()
+        print(f"DEBUG: avg_views_per_day data: {avg_views_per_day}")
         
         # Prepare scatter plot data (duration vs engagement rate)
         scatter_data = {
@@ -703,6 +708,7 @@ def get_dashboard_data():
             },
             'sentiment_stats': sentiment_stats,
             'posting_schedule': posting_schedule,
+            'avg_views_per_day': avg_views_per_day,
             'top_shorts': top_shorts,
             'scatter_data': scatter_data,
             'time_series_data': time_series_data

@@ -54,6 +54,9 @@ export interface DashboardData {
   posting_schedule: {
     [key: string]: number;
   };
+  avg_views_per_day?: {
+    [key: string]: number;
+  };
   top_shorts: Array<{
     title: string;
     view_count: number;

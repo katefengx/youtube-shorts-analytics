@@ -45,3 +45,25 @@
   gap: 1rem;
   flex: 1;
 }
+
+/* Bar Chart Header Styles */
+.combined-bar-chart {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.bar-chart-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bar-chart-subtitle {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 400;
+}

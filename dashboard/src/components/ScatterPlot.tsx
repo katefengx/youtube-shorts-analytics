@@ -20,7 +20,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, onHoverPoint }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  const margin = { top: 15, right: 20, bottom: 40, left: 60 };
+  const margin = { top: 15, right: 20, bottom: 50, left: 60 };
   const [hoverInfo, setHoverInfo] = useState<{
     duration: number;
     engagement: number;

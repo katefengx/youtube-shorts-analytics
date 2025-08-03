@@ -31,7 +31,7 @@ const DonutEngagement: React.FC<DonutEngagementProps> = ({
   return (
     <div className="engagement-section">
       <div className="donut-chart_title">
-        <h3>ENGAGEMENT FEATURES</h3>
+        <h3>FEATURE PERFORMANCE</h3>
         <p className="donut-chart_subtitle">hashtag and emoji usage analysis</p>
         <div className="donut-instruction">
           Click on sections in the charts to filter the dashboard by hashtag and
@@ -56,7 +56,7 @@ const DonutEngagement: React.FC<DonutEngagementProps> = ({
           label={`USE`}
           icon={<span>#</span>}
           title="hashtags"
-          description={`${hashtagData.avg_hashtags_per_video} hashtags per Short with hashtags`}
+          description={`${hashtagData.avg_hashtags_per_video} hashtags per Shorts with hashtags`}
           onFilterChange={onFilterChange}
         />
         <DonutChart
@@ -65,12 +65,18 @@ const DonutEngagement: React.FC<DonutEngagementProps> = ({
           label={`USE`}
           icon={<span>😀</span>}
           title="emojis"
-          description={`${emojiData.avg_emojis_per_video} emojis per Short with emojis`}
+          description={`${emojiData.avg_emojis_per_video} emojis per Shorts with emojis`}
           onFilterChange={onFilterChange}
         />
       </div>
       {/* Combined Bar Chart */}
       <div className="combined-bar-chart">
+        <div className="bar-chart-header">
+          <h4>FEATURE PERFORMANCE</h4>
+          <p className="bar-chart-subtitle">
+            average views with and without features
+          </p>
+        </div>
         <FeatureBarChart
           hashtagData={{
             withFeature: filteredData.hashtag_stats.avg_views_with,
