@@ -183,79 +183,95 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Restore analysis state from localStorage (after overlays are defined)
   const savedAnalysisState = localStorage.getItem("analysisComplete");
-  if (savedAnalysisState === "true" && savedChannelId) {
-    console.log("Restoring previous analysis state");
+  const cachedApiData = localStorage.getItem("cachedApiData");
+
+  if (savedAnalysisState === "true" && savedChannelId && cachedApiData) {
+    console.log("Restoring previous analysis state with cached data");
     channelAnalysisComplete = true;
     csvUploadComplete = localStorage.getItem("csvUploadComplete") === "true";
 
-    // Check if we have cached API data
-    const cachedApiData = localStorage.getItem("cachedApiData");
-    if (cachedApiData) {
-      try {
-        const parsedData = JSON.parse(cachedApiData);
-        console.log("Found cached API data, restoring dashboard...");
+    try {
+      const parsedData = JSON.parse(cachedApiData);
+      console.log("Found cached API data, restoring dashboard...");
 
-        // Display the cached results
-        const summary = parsedData.data.summary;
+      // Display the cached results
+      const summary = parsedData.data.summary;
 
-        // Clone the template
-        const template = document.getElementById("cached-results-template");
-        const resultsDiv = template.content.cloneNode(true);
+      // Clone the template
+      const template = document.getElementById("cached-results-template");
+      const resultsDiv = template.content.cloneNode(true);
 
-        // Update the values
-        resultsDiv.querySelector("#cached-total-shorts").textContent =
-          summary.total_shorts;
-        resultsDiv.querySelector("#cached-total-views").textContent =
-          summary.total_views.toLocaleString();
-        resultsDiv.querySelector("#cached-avg-views").textContent = Math.round(
-          summary.avg_views_per_short,
-        ).toLocaleString();
-        resultsDiv.querySelector("#cached-date-range").textContent =
-          `${new Date(summary.date_range.start).toLocaleDateString()} - ${new Date(summary.date_range.end).toLocaleDateString()}`;
+      // Update the values
+      resultsDiv.querySelector("#cached-total-shorts").textContent =
+        summary.total_shorts;
+      resultsDiv.querySelector("#cached-total-views").textContent =
+        summary.total_views.toLocaleString();
+      resultsDiv.querySelector("#cached-avg-views").textContent = Math.round(
+        summary.avg_views_per_short,
+      ).toLocaleString();
+      resultsDiv.querySelector("#cached-date-range").textContent =
+        `${new Date(summary.date_range.start).toLocaleDateString()} - ${new Date(summary.date_range.end).toLocaleDateString()}`;
 
-        // Insert results after the progress section
-        const progressSection = document.getElementById("progress-section");
-        if (progressSection) {
-          progressSection.parentNode.insertBefore(
-            resultsDiv,
-            progressSection.nextSibling,
-          );
+      // Insert results after the progress section
+      const progressSection = document.getElementById("progress-section");
+      if (progressSection) {
+        progressSection.parentNode.insertBefore(
+          resultsDiv,
+          progressSection.nextSibling,
+        );
+      }
+
+      // Unlock sections based on saved state
+      console.log("Unlocking sections based on saved state...");
+      if (dashboardOverlay) {
+        dashboardOverlay.style.display = "none";
+        dashboardOverlay.style.opacity = "1";
+        console.log("Dashboard overlay unlocked");
+      }
+      if (csvOverlay) {
+        csvOverlay.style.display = "none";
+        csvOverlay.style.opacity = "1";
+        console.log("CSV overlay unlocked");
+      }
+      if (analyticsOverlay && csvUploadComplete) {
+        analyticsOverlay.style.display = "none";
+        analyticsOverlay.style.opacity = "1";
+        console.log("Analytics overlay unlocked");
+      }
+
+      // Load dashboard if it was previously loaded
+      setTimeout(() => {
+        console.log("Attempting to load dashboard...");
+        if (window.loadDashboard) {
+          console.log("loadDashboard function found, calling it...");
+          window.loadDashboard();
+        } else {
+          console.log("loadDashboard function not found");
         }
-      } catch (e) {
-        console.error("Error parsing cached API data:", e);
-        // Clear invalid cached data
-        localStorage.removeItem("cachedApiData");
-      }
+      }, 100);
+    } catch (e) {
+      console.error("Error parsing cached API data:", e);
+      // Clear invalid cached data and reset state
+      localStorage.removeItem("cachedApiData");
+      localStorage.removeItem("analysisComplete");
+      localStorage.removeItem("csvUploadComplete");
+      channelAnalysisComplete = false;
+      csvUploadComplete = false;
     }
-
-    // Unlock sections based on saved state
-    console.log("Unlocking sections based on saved state...");
-    if (dashboardOverlay) {
-      dashboardOverlay.style.display = "none";
-      dashboardOverlay.style.opacity = "1";
-      console.log("Dashboard overlay unlocked");
-    }
-    if (csvOverlay) {
-      csvOverlay.style.display = "none";
-      csvOverlay.style.opacity = "1";
-      console.log("CSV overlay unlocked");
-    }
-    if (analyticsOverlay && csvUploadComplete) {
-      analyticsOverlay.style.display = "none";
-      analyticsOverlay.style.opacity = "1";
-      console.log("Analytics overlay unlocked");
-    }
-
-    // Load dashboard if it was previously loaded
-    setTimeout(() => {
-      console.log("Attempting to load dashboard...");
-      if (window.loadDashboard) {
-        console.log("loadDashboard function found, calling it...");
-        window.loadDashboard();
-      } else {
-        console.log("loadDashboard function not found");
-      }
-    }, 100);
+  } else if (
+    savedAnalysisState === "true" &&
+    savedChannelId &&
+    !cachedApiData
+  ) {
+    // We have saved state but no cached data - clear the invalid state
+    console.log(
+      "Found saved analysis state but no cached data - clearing invalid state",
+    );
+    localStorage.removeItem("analysisComplete");
+    localStorage.removeItem("csvUploadComplete");
+    localStorage.removeItem("cachedApiData");
+    channelAnalysisComplete = false;
+    csvUploadComplete = false;
   }
 
   // Dashboard will be loaded after channel analysis is complete
