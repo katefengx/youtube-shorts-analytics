@@ -154,22 +154,33 @@ document.addEventListener("DOMContentLoaded", function () {
       csvUploadComplete = localStorage.getItem("csvUploadComplete") === "true";
 
       // Unlock sections based on saved state
+      console.log("Unlocking sections based on saved state...");
       if (dashboardOverlay) {
         dashboardOverlay.style.display = "none";
+        dashboardOverlay.style.opacity = "1";
+        console.log("Dashboard overlay unlocked");
       }
       if (csvOverlay) {
         csvOverlay.style.display = "none";
+        csvOverlay.style.opacity = "1";
+        console.log("CSV overlay unlocked");
       }
       if (analyticsOverlay && csvUploadComplete) {
         analyticsOverlay.style.display = "none";
+        analyticsOverlay.style.opacity = "1";
+        console.log("Analytics overlay unlocked");
       }
 
       // Load dashboard if it was previously loaded
       setTimeout(() => {
+        console.log("Attempting to load dashboard...");
         if (window.loadDashboard) {
+          console.log("loadDashboard function found, calling it...");
           window.loadDashboard();
+        } else {
+          console.log("loadDashboard function not found");
         }
-      }, 500);
+      }, 100);
     }
   }
 
