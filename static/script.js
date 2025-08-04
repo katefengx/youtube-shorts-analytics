@@ -140,6 +140,67 @@ document.addEventListener("DOMContentLoaded", function () {
   let channelAnalysisComplete = false;
   let csvUploadComplete = false;
 
+  // Load saved channel ID from localStorage
+  const savedChannelId = localStorage.getItem('lastChannelId');
+  if (savedChannelId && channelInput) {
+    channelInput.value = savedChannelId;
+    console.log('Restored saved channel ID:', savedChannelId);
+    
+    // Check if we have saved analysis state
+    const savedAnalysisState = localStorage.getItem('analysisComplete');
+    if (savedAnalysisState === 'true') {
+      console.log('Restoring previous analysis state');
+      channelAnalysisComplete = true;
+      csvUploadComplete = localStorage.getItem('csvUploadComplete') === 'true';
+      
+      // Unlock sections based on saved state
+      if (dashboardOverlay) {
+        dashboardOverlay.style.display = "none";
+      }
+      if (csvOverlay) {
+        csvOverlay.style.display = "none";
+      }
+      if (analyticsOverlay && csvUploadComplete) {
+        analyticsOverlay.style.display = "none";
+      }
+      
+      // Load dashboard if it was previously loaded
+      setTimeout(() => {
+        if (window.loadDashboard) {
+          window.loadDashboard();
+        }
+      }, 500);
+    }
+  }
+
+  // Add clear saved data functionality
+  function clearSavedData() {
+    localStorage.removeItem('lastChannelId');
+    localStorage.removeItem('analysisComplete');
+    localStorage.removeItem('csvUploadComplete');
+    console.log('Cleared all saved data');
+    
+    // Reset UI state
+    channelAnalysisComplete = false;
+    csvUploadComplete = false;
+    if (channelInput) channelInput.value = '';
+    
+    // Relock sections
+    if (dashboardOverlay) dashboardOverlay.style.display = "block";
+    if (csvOverlay) csvOverlay.style.display = "block";
+    if (analyticsOverlay) analyticsOverlay.style.display = "block";
+    
+    // Reload page to reset everything
+    window.location.reload();
+  }
+
+  // Add clear button to the page (optional)
+  const clearButton = document.createElement('button');
+  clearButton.textContent = 'Clear Saved Data';
+  clearButton.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 8px 12px; background: #e29191; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;';
+  clearButton.addEventListener('click', clearSavedData);
+  document.body.appendChild(clearButton);
+
   // Lock overlays
   const dashboardOverlay = document.getElementById("dashboard-lock-overlay");
   const csvOverlay = document.getElementById("csv-lock-overlay");
@@ -251,6 +312,11 @@ document.addEventListener("DOMContentLoaded", function () {
     clearError();
     const channelId = channelInput.value.trim();
 
+    // Clear previous analysis state when starting new analysis
+    localStorage.removeItem('analysisComplete');
+    localStorage.removeItem('csvUploadComplete');
+    console.log('Cleared previous analysis state for new channel');
+
     if (!channelId) {
       showError("Please enter a YouTube Channel ID.");
       return;
@@ -339,6 +405,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         analyzeBtn.disabled = false;
         channelAnalysisComplete = true;
+
+        // Save the channel ID to localStorage for persistence
+        const channelId = channelInput.value.trim();
+        localStorage.setItem('lastChannelId', channelId);
+        localStorage.setItem('analysisComplete', 'true');
+        console.log('Saved channel ID and analysis state to localStorage:', channelId);
 
         // UNLOCK dashboard section
         if (dashboardOverlay) {
@@ -481,6 +553,10 @@ document.addEventListener("DOMContentLoaded", function () {
         btnText.style.display = "inline";
         btnLoading.style.display = "none";
         csvUploadComplete = true;
+
+        // Save CSV upload state to localStorage
+        localStorage.setItem('csvUploadComplete', 'true');
+        console.log('Saved CSV upload state to localStorage');
 
         // UNLOCK analytics section
         if (analyticsOverlay) {
