@@ -43,7 +43,14 @@ def serve_index():
 
 @app.route('/test')
 def test_route():
-    return jsonify({'status': 'Flask app is working', 'files': os.listdir('static/dashboard/assets')})
+    api_key_status = "API_KEY is set" if API_KEY else "API_KEY is NOT set"
+    api_key_preview = API_KEY[:10] + "..." if API_KEY else "None"
+    return jsonify({
+        'status': 'Flask app is working', 
+        'files': os.listdir('static/dashboard/assets'),
+        'api_key_status': api_key_status,
+        'api_key_preview': api_key_preview
+    })
 
 @app.route('/dashboard')
 def serve_dashboard():
