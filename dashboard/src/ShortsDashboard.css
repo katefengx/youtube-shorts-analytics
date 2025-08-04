@@ -32,6 +32,7 @@ html {
 
 .header-content {
   flex: 1;
+  margin-left: 1rem;
 }
 
 .header-right-content {
@@ -42,16 +43,17 @@ html {
 }
 
 .dashboard-title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 2.8rem;
+  font-weight: 600;
   color: #ae3131;
-  margin: 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
   flex-shrink: 0;
 }
 
 .dashboard-subtitle {
   font-size: 1rem;
-  color: #666;
+  color: #ae3131;
   margin: 0.5rem 0 1rem 0;
   font-weight: 400;
 }
@@ -59,7 +61,8 @@ html {
 .summary-metrics {
   display: flex;
   gap: 2rem;
-  margin-top: 1rem;
+  margin-top: 2rem;
+  margin-left: 3rem;
 }
 
 .summary-metric {
@@ -69,13 +72,13 @@ html {
 .summary-metric-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #ae3131;
+  color: #b76969;
   display: block;
 }
 
 .summary-metric-label {
   font-size: 0.875rem;
-  color: #666;
+  color: #b76969;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-top: 0.25rem;

@@ -31,13 +31,13 @@
 }
 
 .time-filter .rc-slider-track {
-  background-color: #ff6b6b;
+  background-color: #fc9595;
   height: 4px;
   border-radius: 2px;
 }
 
 .time-filter .rc-slider-handle {
-  border: 2px solid #ff6b6b;
+  border: 2px solid #fc9595;
   background-color: white;
   width: 16px;
   height: 16px;

@@ -21,7 +21,7 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({
   const negativeCount = sentimentStats.negative || 0;
   const neutralCount = sentimentStats.neutral || 0;
 
-  // Calculate percentages
+  // Calculate percentages based on filtered data
   const positivePercentage = total > 0 ? (positiveCount / total) * 100 : 0;
   const negativePercentage = total > 0 ? (negativeCount / total) * 100 : 0;
   const neutralPercentage = total > 0 ? (neutralCount / total) * 100 : 0;

@@ -98,7 +98,6 @@ const ShortsDashboard: React.FC = () => {
     if (newFilters.emojis !== undefined) {
       url += `&emoji_filter=${newFilters.emojis}`;
     }
-
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
@@ -158,7 +157,9 @@ const ShortsDashboard: React.FC = () => {
         <div className="header-content">
           <div>
             <h1 className="dashboard-title">
-              Youtube Shorts Caption Performance Dashboard
+              Youtube Shorts Caption
+              <br />
+              Performance Dashboard
             </h1>
             <p className="dashboard-subtitle">
               Track how different captions impact your Shorts' success.

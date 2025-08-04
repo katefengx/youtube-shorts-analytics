@@ -156,8 +156,9 @@ def process_analytics_data(shorts_path):
     total_stats['hour'] = total_stats['published_at'].dt.hour
             
     # Filter for Shorts after a certain date
-    start_date = pd.Timestamp('2022-06-05', tz='UTC')
-    shorts = total_stats[total_stats['published_at'] >= start_date].copy()
+    # start_date = pd.Timestamp('2022-06-05', tz='UTC')
+    # shorts = total_stats[total_stats['published_at'] >= start_date].copy()
+     shorts = total_stats
     
     # Add features
     shorts['has_hashtags'] = shorts['title'].str.contains('#', na=False)
@@ -176,6 +177,8 @@ def process_analytics_data(shorts_path):
         return blob.sentiment.polarity
     shorts['sentiment_polarity'] = shorts['clean_title'].apply(compute_sentiment)
     shorts['sentiment'] = shorts['sentiment_polarity'].apply(lambda x: 'positive' if x > 0 else 'negative' if x < 0 else 'neutral')
+    
+
     shorts['day_of_week'] = pd.to_datetime(shorts['date']).dt.day_name()
     shorts = shorts.sort_values('published_at')
 
@@ -595,6 +598,8 @@ def get_dashboard_data():
             df = df[df['has_emojis'] == has_emojis]
             print(f"DEBUG: Filtered by emojis (has_emojis={has_emojis}), {len(df)} records remaining")
         
+
+        
         # Calculate dashboard statistics
         total_shorts = len(df)
         avg_views = float(df['view_count'].mean()) if total_shorts > 0 else 0
@@ -637,9 +642,13 @@ def get_dashboard_data():
         
         # Top performing shorts (by views)
         top_shorts = df.nlargest(5, 'view_count')[['title', 'view_count', 'like_count', 'comment_count']].to_dict('records')
+        print(f"DEBUG: Top shorts after filtering: {len(top_shorts)} shorts")
         
         # Sentiment analysis
         sentiment_stats = df['sentiment'].value_counts().to_dict()
+        print(f"DEBUG: Sentiment stats after filtering: {sentiment_stats}")
+        
+
         
         # Posting schedule (day of week)
         posting_schedule = df['day_of_week'].value_counts().to_dict()
@@ -653,6 +662,7 @@ def get_dashboard_data():
         scatter_data = {
             'duration_vs_engagement': df[['duration_seconds', 'engagement_rate']].dropna().to_dict('records'),
         }
+        print(f"DEBUG: Scatter data points after filtering: {len(scatter_data['duration_vs_engagement'])} points")
         
             # Prepare time series data for sparklines
         # Group by week and calculate weekly averages
