@@ -148,7 +148,15 @@ def process_analytics_data(shorts_path):
     w_comment_norm = 0.7842535737762139 # see Mikayla_Stats_Pull in google colab
     w_like_norm = 0.21574642622378612 # see Mikayla_Stats_Pull in google colab
     total_stats = pd.read_csv(shorts_path)
-    total_stats['engagement_rate'] = (total_stats['comment_count'] * w_comment_norm + total_stats['like_count'] * w_like_norm) / total_stats['view_count']
+    
+    # Clean NaN values in numeric columns before calculations
+    total_stats['view_count'] = total_stats['view_count'].fillna(0)
+    total_stats['like_count'] = total_stats['like_count'].fillna(0)
+    total_stats['comment_count'] = total_stats['comment_count'].fillna(0)
+    total_stats['duration_seconds'] = total_stats['duration_seconds'].fillna(0)
+    
+    # Calculate engagement rate with safe division
+    total_stats['engagement_rate'] = (total_stats['comment_count'] * w_comment_norm + total_stats['like_count'] * w_like_norm) / total_stats['view_count'].replace(0, 1)
     total_stats['num_words'] = total_stats['title'].str.split().str.len()
     total_stats['published_at'] = pd.to_datetime(total_stats['published_at'], utc=True)
     total_stats['date'] = total_stats['published_at'].dt.date
@@ -161,6 +169,9 @@ def process_analytics_data(shorts_path):
     shorts = total_stats.copy()
     
     # Add features
+    # Handle NaN titles by filling with empty string
+    shorts['title'] = shorts['title'].fillna('')
+    
     shorts['has_hashtags'] = shorts['title'].str.contains('#', na=False)
     shorts['hashtag_count'] = shorts['title'].str.count('#')
 
@@ -229,7 +240,7 @@ def process_analytics_data(shorts_path):
                 'end': str(shorts['published_at'].max())
             },
             'total_views': int(shorts['view_count'].sum()),
-            'avg_views_per_short': float(shorts['view_count'].mean())
+            'avg_views_per_short': float(shorts['view_count'].mean()) if len(shorts) > 0 else 0
         }
     }
 
@@ -554,6 +565,10 @@ def get_processed_shorts_data():
         print("DEBUG: processed_shorts.csv not found")
         return jsonify({'data': []})
     df = pd.read_csv(processed_shorts_path)
+    
+    # Replace NaN values with None for JSON serialization
+    df = df.replace([np.nan, np.inf, -np.inf], None)
+    
     data = df.to_dict('records')
     print(f"DEBUG: Returning {len(data)} records from processed_shorts.csv")
     return jsonify({'data': data})
@@ -655,7 +670,7 @@ def get_dashboard_data():
         print(f"DEBUG: posting_schedule data: {posting_schedule}")
         
         # Average views per day of the week (success metric)
-        avg_views_per_day = df.groupby('day_of_week')['view_count'].mean().to_dict()
+        avg_views_per_day = df.groupby('day_of_week')['view_count'].mean().replace([np.nan, np.inf, -np.inf], 0).to_dict()
         print(f"DEBUG: avg_views_per_day data: {avg_views_per_day}")
         
         # Prepare scatter plot data (duration vs engagement rate)
@@ -676,6 +691,9 @@ def get_dashboard_data():
             'like_count': 'mean', 
             'comment_count': 'mean'
         }).reset_index()
+        
+        # Replace NaN values with 0 for JSON serialization
+        monthly_stats = monthly_stats.replace([np.nan, np.inf, -np.inf], 0)
         
         # Rename week_start back to date for frontend compatibility
         monthly_stats = monthly_stats.rename(columns={'month_start': 'date'})
