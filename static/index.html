@@ -313,6 +313,64 @@
       );
     </script>
 
+    <!-- HTML Templates -->
+    <template id="analysis-results-template">
+      <div class="analysis-results">
+        <h3 class="results-title">Channel Analysis Results</h3>
+        <div class="results-grid">
+          <div class="result-item">
+            <div class="result-value" id="total-shorts">0</div>
+            <div class="result-label">Total Shorts</div>
+          </div>
+          <div class="result-item">
+            <div class="result-value" id="total-views">0</div>
+            <div class="result-label">Total Views</div>
+          </div>
+          <div class="result-item">
+            <div class="result-value" id="avg-views">0</div>
+            <div class="result-label">Avg Views/Short</div>
+          </div>
+        </div>
+        <div class="results-date-range">
+          Date range: <span id="date-range">-</span>
+        </div>
+      </div>
+    </template>
+
+    <template id="cached-results-template">
+      <div class="analysis-results cached">
+        <h3 class="results-title">Channel Analysis Results (Cached)</h3>
+        <div class="results-grid">
+          <div class="result-item">
+            <div class="result-value" id="cached-total-shorts">0</div>
+            <div class="result-label">Total Shorts</div>
+          </div>
+          <div class="result-item">
+            <div class="result-value" id="cached-total-views">0</div>
+            <div class="result-label">Total Views</div>
+          </div>
+          <div class="result-item">
+            <div class="result-value" id="cached-avg-views">0</div>
+            <div class="result-label">Avg Views/Short</div>
+          </div>
+        </div>
+        <div class="results-date-range">
+          Date range: <span id="cached-date-range">-</span>
+        </div>
+      </div>
+    </template>
+
+    <template id="csv-success-template">
+      <div class="csv-success">
+        <h3 class="success-title">✓ CSV Upload Successful</h3>
+        <p class="success-message">
+          Found <span id="peaks-count">0</span> subscriber peaks and
+          <span id="attributions-count">0</span> attributions. The Shorts &
+          Subscriber Spikes chart is now unlocked!
+        </p>
+      </div>
+    </template>
+
     <script src="config.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="script.js"></script>

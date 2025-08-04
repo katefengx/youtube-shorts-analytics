@@ -900,3 +900,100 @@ body::-webkit-scrollbar {
     max-width: 98vw;
   }
 }
+
+/* =====================
+   Analysis Results Styles
+   ===================== */
+.analysis-results {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.analysis-results.cached {
+  background: #f0f8ff;
+  border: 1px solid #b3d9ff;
+}
+
+.results-title {
+  color: #555;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.result-item {
+  text-align: center;
+}
+
+.result-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #e29191;
+}
+
+.result-label {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.results-date-range {
+  font-size: 0.9em;
+  color: #666;
+  text-align: center;
+}
+
+/* =====================
+   CSV Success Styles
+   ===================== */
+.csv-success {
+  margin-top: 20px;
+  padding: 20px;
+  background: #e8f5e8;
+  border-radius: 8px;
+  border: 1px solid #4caf50;
+}
+
+.success-title {
+  color: #2e7d32;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.success-message {
+  color: #2e7d32;
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* =====================
+   Clear Button Styles
+   ===================== */
+.clear-data-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: #e29191;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.clear-data-button:hover {
+  background: #d17a7a;
+}

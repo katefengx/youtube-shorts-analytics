@@ -153,6 +153,45 @@ document.addEventListener("DOMContentLoaded", function () {
       channelAnalysisComplete = true;
       csvUploadComplete = localStorage.getItem("csvUploadComplete") === "true";
 
+      // Check if we have cached API data
+      const cachedApiData = localStorage.getItem("cachedApiData");
+      if (cachedApiData) {
+        try {
+          const parsedData = JSON.parse(cachedApiData);
+          console.log("Found cached API data, restoring dashboard...");
+
+          // Display the cached results
+          const summary = parsedData.data.summary;
+
+          // Clone the template
+          const template = document.getElementById("cached-results-template");
+          const resultsDiv = template.content.cloneNode(true);
+
+          // Update the values
+          resultsDiv.querySelector("#cached-total-shorts").textContent =
+            summary.total_shorts;
+          resultsDiv.querySelector("#cached-total-views").textContent =
+            summary.total_views.toLocaleString();
+          resultsDiv.querySelector("#cached-avg-views").textContent =
+            Math.round(summary.avg_views_per_short).toLocaleString();
+          resultsDiv.querySelector("#cached-date-range").textContent =
+            `${new Date(summary.date_range.start).toLocaleDateString()} - ${new Date(summary.date_range.end).toLocaleDateString()}`;
+
+          // Insert results after the progress section
+          const progressSection = document.getElementById("progress-section");
+          if (progressSection) {
+            progressSection.parentNode.insertBefore(
+              resultsDiv,
+              progressSection.nextSibling,
+            );
+          }
+        } catch (e) {
+          console.error("Error parsing cached API data:", e);
+          // Clear invalid cached data
+          localStorage.removeItem("cachedApiData");
+        }
+      }
+
       // Unlock sections based on saved state
       console.log("Unlocking sections based on saved state...");
       if (dashboardOverlay) {
@@ -189,6 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.removeItem("lastChannelId");
     localStorage.removeItem("analysisComplete");
     localStorage.removeItem("csvUploadComplete");
+    localStorage.removeItem("cachedApiData");
     console.log("Cleared all saved data");
 
     // Reset UI state
@@ -208,8 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Add clear button to the page (optional)
   const clearButton = document.createElement("button");
   clearButton.textContent = "Clear Saved Data";
-  clearButton.style.cssText =
-    "position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 8px 12px; background: #e29191; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;";
+  clearButton.className = "clear-data-button";
   clearButton.addEventListener("click", clearSavedData);
   document.body.appendChild(clearButton);
 
@@ -324,10 +363,15 @@ document.addEventListener("DOMContentLoaded", function () {
     clearError();
     const channelId = channelInput.value.trim();
 
-    // Clear previous analysis state when starting new analysis
-    localStorage.removeItem("analysisComplete");
-    localStorage.removeItem("csvUploadComplete");
-    console.log("Cleared previous analysis state for new channel");
+    // Check if this is a new channel ID
+    const lastChannelId = localStorage.getItem("lastChannelId");
+    if (lastChannelId && lastChannelId !== channelId) {
+      // Clear previous analysis state when starting new analysis for different channel
+      localStorage.removeItem("analysisComplete");
+      localStorage.removeItem("csvUploadComplete");
+      localStorage.removeItem("cachedApiData");
+      console.log("Cleared previous analysis state for new channel");
+    }
 
     if (!channelId) {
       showError("Please enter a YouTube Channel ID.");
@@ -384,32 +428,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Display results
         const summary = data.data.summary;
-        const resultsHtml = `
-          <div style="margin-top:20px; padding:20px; background: #f8f9fa; border-radius: 8px;">
-            <h3 style="color: #555; margin-bottom: 15px;">Channel Analysis Results</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px;">
-              <div style="text-align: center;">
-                <div style="font-size: 2rem; font-weight: bold; color: #e29191;">${summary.total_shorts}</div>
-                <div style="color: #666;">Total Shorts</div>
-              </div>
-              <div style="text-align: center;">
-                <div style="font-size: 2rem; font-weight: bold; color: #e29191;">${summary.total_views.toLocaleString()}</div>
-                <div style="color: #666;">Total Views</div>
-              </div>
-              <div style="text-align: center;">
-                <div style="font-size: 2rem; font-weight: bold; color: #e29191;">${Math.round(summary.avg_views_per_short).toLocaleString()}</div>
-                <div style="color: #666;">Avg Views/Short</div>
-              </div>
-            </div>
-            <div style="margin-top: 15px; font-size: 0.9em; color: #666;">
-              Date range: ${new Date(summary.date_range.start).toLocaleDateString()} - ${new Date(summary.date_range.end).toLocaleDateString()}
-            </div>
-          </div>
-        `;
+
+        // Clone the template
+        const template = document.getElementById("analysis-results-template");
+        const resultsDiv = template.content.cloneNode(true);
+
+        // Update the values
+        resultsDiv.querySelector("#total-shorts").textContent =
+          summary.total_shorts;
+        resultsDiv.querySelector("#total-views").textContent =
+          summary.total_views.toLocaleString();
+        resultsDiv.querySelector("#avg-views").textContent = Math.round(
+          summary.avg_views_per_short,
+        ).toLocaleString();
+        resultsDiv.querySelector("#date-range").textContent =
+          `${new Date(summary.date_range.start).toLocaleDateString()} - ${new Date(summary.date_range.end).toLocaleDateString()}`;
 
         // Insert results after the progress section
-        const resultsDiv = document.createElement("div");
-        resultsDiv.innerHTML = resultsHtml;
         progressSection.parentNode.insertBefore(
           resultsDiv,
           progressSection.nextSibling,
@@ -418,12 +453,13 @@ document.addEventListener("DOMContentLoaded", function () {
         analyzeBtn.disabled = false;
         channelAnalysisComplete = true;
 
-        // Save the channel ID to localStorage for persistence
+        // Save the channel ID and API response data to localStorage for persistence
         const channelId = channelInput.value.trim();
         localStorage.setItem("lastChannelId", channelId);
         localStorage.setItem("analysisComplete", "true");
+        localStorage.setItem("cachedApiData", JSON.stringify(data));
         console.log(
-          "Saved channel ID and analysis state to localStorage:",
+          "Saved channel ID, analysis state, and API data to localStorage:",
           channelId,
         );
 
@@ -549,19 +585,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Display success message
-        const successHtml = `
-          <div style="margin-top:20px; padding:20px; background: #e8f5e8; border-radius: 8px; border: 1px solid #4caf50;">
-            <h3 style="color: #2e7d32; margin-bottom: 15px;">✓ CSV Upload Successful</h3>
-            <p style="color: #2e7d32; margin: 0;">
-              Found ${data.sub_peaks.length} subscriber peaks and ${data.attributions.length} attributions. 
-              The Shorts & Subscriber Spikes chart is now unlocked!
-            </p>
-          </div>
-        `;
+        // Clone the template
+        const template = document.getElementById("csv-success-template");
+        const successDiv = template.content.cloneNode(true);
+
+        // Update the values
+        successDiv.querySelector("#peaks-count").textContent =
+          data.sub_peaks.length;
+        successDiv.querySelector("#attributions-count").textContent =
+          data.attributions.length;
 
         // Insert success message after the CSV upload form
-        const successDiv = document.createElement("div");
-        successDiv.innerHTML = successHtml;
         uploadCsvBtn.parentNode.parentNode.appendChild(successDiv);
 
         uploadCsvBtn.disabled = false;
