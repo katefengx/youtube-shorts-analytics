@@ -158,7 +158,7 @@ def process_analytics_data(shorts_path):
     # Filter for Shorts after a certain date
     # start_date = pd.Timestamp('2022-06-05', tz='UTC')
     # shorts = total_stats[total_stats['published_at'] >= start_date].copy()
-     shorts = total_stats.copy()
+    shorts = total_stats.copy()
     
     # Add features
     shorts['has_hashtags'] = shorts['title'].str.contains('#', na=False)
