@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import "./FeatureBarChart.css";
 
 interface EngagementData {
@@ -15,6 +15,42 @@ const FeatureBarChart: React.FC<FeatureBarChartProps> = ({
   hashtagData,
   emojiData,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 300, height: 200 });
+
+  // Update dimensions when container size changes
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
+
+        // Use container size, but maintain reasonable minimums
+        const width = Math.max(containerWidth, 200);
+        const height = Math.max(containerHeight, 100);
+
+        setDimensions({ width, height });
+      }
+    };
+
+    // Initial dimensions calculation
+    updateDimensions();
+
+    // Add resize listener
+    const resizeObserver = new ResizeObserver(updateDimensions);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    // Also update on next tick to ensure dimensions are available
+    const timeoutId = setTimeout(updateDimensions, 0);
+
+    return () => {
+      resizeObserver.disconnect();
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   const formatNumber = (value: number) => {
     if (value >= 1000) {
       return `${(value / 1000).toFixed(1)}K`;
@@ -31,10 +67,11 @@ const FeatureBarChart: React.FC<FeatureBarChartProps> = ({
     emojiData.withoutFeature,
   );
 
-  const maxHeight = 200;
+  // Use responsive height based on container
+  const maxHeight = Math.min(dimensions.height * 0.6, 200);
 
   return (
-    <div className="bars-container">
+    <div className="bars-container" ref={containerRef}>
       {/* With hashtags */}
       <div className="bar-group">
         <div className="bar-value">{formatNumber(hashtagData.withFeature)}</div>
