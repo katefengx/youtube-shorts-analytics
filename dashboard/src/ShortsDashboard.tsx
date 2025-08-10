@@ -25,6 +25,13 @@ const ShortsDashboard: React.FC = () => {
     emojis?: boolean;
   }>({});
 
+  // State for KPI card hover data
+  const [hoverData, setHoverData] = useState<{
+    views?: { monthYear: string; value: string } | null;
+    likes?: { monthYear: string; value: string } | null;
+    comments?: { monthYear: string; value: string } | null;
+  }>({});
+
   // Fetch all available dates on mount
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/shorts_data`)
@@ -53,6 +60,15 @@ const ShortsDashboard: React.FC = () => {
     setLoading(true);
     setError(null);
     let url = `${API_BASE_URL}/api/dashboard_data?start_date=${startDate}&end_date=${endDate}`;
+
+    // Add filter parameters
+    if (activeFilters.hashtags !== undefined) {
+      url += `&hashtag_filter=${activeFilters.hashtags}`;
+    }
+    if (activeFilters.emojis !== undefined) {
+      url += `&emoji_filter=${activeFilters.emojis}`;
+    }
+
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
@@ -67,7 +83,7 @@ const ShortsDashboard: React.FC = () => {
         setError(err.message);
         setLoading(false);
       });
-  }, [selectedRange, allDates]);
+  }, [selectedRange, allDates, activeFilters]);
 
   const handleFilterChange = (filter: {
     type: string;
@@ -81,37 +97,6 @@ const ShortsDashboard: React.FC = () => {
       newFilters.emojis = filter.hasFeature;
     }
     setActiveFilters(newFilters);
-
-    setLoading(true);
-
-    // Make a new API call with filter parameters
-    const [startIdx, endIdx] = selectedRange;
-    const startDate = allDates[startIdx];
-    const endDate = allDates[endIdx];
-
-    let url = `${API_BASE_URL}/api/dashboard_data?start_date=${startDate}&end_date=${endDate}`;
-
-    // Add filter parameters
-    if (newFilters.hashtags !== undefined) {
-      url += `&hashtag_filter=${newFilters.hashtags}`;
-    }
-    if (newFilters.emojis !== undefined) {
-      url += `&emoji_filter=${newFilters.emojis}`;
-    }
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setDashboardData(data);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
   };
 
   const resetFilters = () => {
@@ -157,9 +142,7 @@ const ShortsDashboard: React.FC = () => {
         <div className="header-content">
           <div>
             <h1 className="dashboard-title">
-              Youtube Shorts Caption
-              <br />
-              Performance Dashboard
+              Youtube Shorts Caption Performance Dashboard
             </h1>
             <p className="dashboard-subtitle">
               Track how different captions impact your Shorts' success.
@@ -209,6 +192,16 @@ const ShortsDashboard: React.FC = () => {
               <span className="metric-value">
                 {filteredData.summary.avg_views}
               </span>
+              <div className="metric-hover-info">
+                <span className="hover-date">
+                  {hoverData.views
+                    ? hoverData.views.monthYear
+                    : "Hover chart for details"}
+                </span>
+                <span className="hover-value">
+                  {hoverData.views ? hoverData.views.value : ""}
+                </span>
+              </div>
               {filteredData.time_series_data?.views && (
                 <div className="metric-chart">
                   <AreaChart
@@ -216,6 +209,9 @@ const ShortsDashboard: React.FC = () => {
                       date: item.date,
                       value: item.view_count,
                     }))}
+                    onHoverData={(data) =>
+                      setHoverData((prev) => ({ ...prev, views: data }))
+                    }
                   />
                 </div>
               )}
@@ -225,7 +221,16 @@ const ShortsDashboard: React.FC = () => {
               <span className="metric-value">
                 {filteredData.summary.avg_likes}
               </span>
-
+              <div className="metric-hover-info">
+                <span className="hover-date">
+                  {hoverData.likes
+                    ? hoverData.likes.monthYear
+                    : "Hover chart for details"}
+                </span>
+                <span className="hover-value">
+                  {hoverData.likes ? hoverData.likes.value : ""}
+                </span>
+              </div>
               {filteredData.time_series_data?.likes && (
                 <div className="metric-chart">
                   <AreaChart
@@ -233,6 +238,9 @@ const ShortsDashboard: React.FC = () => {
                       date: item.date,
                       value: item.like_count,
                     }))}
+                    onHoverData={(data) =>
+                      setHoverData((prev) => ({ ...prev, likes: data }))
+                    }
                   />
                 </div>
               )}
@@ -242,6 +250,16 @@ const ShortsDashboard: React.FC = () => {
               <span className="metric-value">
                 {filteredData.summary.avg_comments}
               </span>
+              <div className="metric-hover-info">
+                <span className="hover-date">
+                  {hoverData.comments
+                    ? hoverData.comments.monthYear
+                    : "Hover chart for details"}
+                </span>
+                <span className="hover-value">
+                  {hoverData.comments ? hoverData.comments.value : ""}
+                </span>
+              </div>
               {filteredData.time_series_data?.comments && (
                 <div className="metric-chart">
                   <AreaChart
@@ -251,6 +269,9 @@ const ShortsDashboard: React.FC = () => {
                         value: item.comment_count,
                       }),
                     )}
+                    onHoverData={(data) =>
+                      setHoverData((prev) => ({ ...prev, comments: data }))
+                    }
                   />
                 </div>
               )}
@@ -307,7 +328,10 @@ const ShortsDashboard: React.FC = () => {
 
           {/* Posting Schedule Component */}
           <div className="posting-schedule-section">
-            <PostingSchedule postingSchedule={filteredData.posting_schedule} />
+            <PostingSchedule
+              postingSchedule={filteredData.posting_schedule}
+              avgViewsPerDay={filteredData.avg_views_per_day}
+            />
           </div>
         </div>
       </div>

@@ -45,10 +45,53 @@ const FeatureBarChart: React.FC<FeatureBarChartProps> = ({
     // Also update on next tick to ensure dimensions are available
     const timeoutId = setTimeout(updateDimensions, 0);
 
+    // Force update after a short delay to catch any CSS changes
+    const forceUpdateId = setTimeout(updateDimensions, 100);
+
     return () => {
       resizeObserver.disconnect();
       clearTimeout(timeoutId);
+      clearTimeout(forceUpdateId);
     };
+  }, []);
+
+  // Also update dimensions when the component re-renders
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
+
+        // Use container size, but maintain reasonable minimums
+        const width = Math.max(containerWidth, 200);
+        const height = Math.max(containerHeight, 100);
+
+        setDimensions({ width, height });
+      }
+    };
+
+    // Update dimensions after render
+    const timeoutId = setTimeout(updateDimensions, 0);
+    return () => clearTimeout(timeoutId);
+  });
+
+  // Listen for window resize events
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
+
+        // Use container size, but maintain reasonable minimums
+        const width = Math.max(containerWidth, 200);
+        const height = Math.max(containerHeight, 100);
+
+        setDimensions({ width, height });
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const formatNumber = (value: number) => {
