@@ -488,11 +488,9 @@ def analyze_channel():
                     
                     # Run the analysis scripts
                     script_dir = os.path.dirname(os.path.abspath(__file__))
-                    print(f"DEBUG: Running generate_sub_peaks.py with input: {sub_stats_path}")
                     try:
                         result = subprocess.run([sys.executable, os.path.join(script_dir, 'generate_sub_peaks.py'), sub_stats_path, sub_peaks_path], 
                                               check=True, capture_output=True, text=True, cwd=script_dir)
-                        print(f"DEBUG: generate_sub_peaks.py completed successfully")
                     except subprocess.CalledProcessError as e:
                         print(f"DEBUG: generate_sub_peaks.py failed with error: {e}")
                         print(f"DEBUG: stdout: {e.stdout}")
