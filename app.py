@@ -314,14 +314,16 @@ def analyze_channel():
                         print("DEBUG: Building React dashboard for user data...")
                         build_result = subprocess.run(
                             ['./build_dashboard.sh'], 
-                            check=True, 
                             capture_output=True, 
                             text=True,
                             cwd=os.path.dirname(os.path.abspath(__file__))
                         )
-                        print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
-                    except subprocess.CalledProcessError as e:
-                        print(f"DEBUG: Dashboard build failed: {e.stderr}")
+                        if build_result.returncode == 0:
+                            print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
+                        else:
+                            print(f"DEBUG: Dashboard build failed: {build_result.stderr}")
+                    except Exception as e:
+                        print(f"DEBUG: Dashboard build failed: {e}")
                         # Continue without dashboard build if it fails
                     
                     response_data = {
@@ -394,14 +396,16 @@ def analyze_channel():
                         print("DEBUG: Building React dashboard for full analysis...")
                         build_result = subprocess.run(
                             ['./build_dashboard.sh'], 
-                            check=True, 
                             capture_output=True, 
                             text=True,
                             cwd=os.path.dirname(os.path.abspath(__file__))
                         )
-                        print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
-                    except subprocess.CalledProcessError as e:
-                        print(f"DEBUG: Dashboard build failed: {e.stderr}")
+                        if build_result.returncode == 0:
+                            print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
+                        else:
+                            print(f"DEBUG: Dashboard build failed: {build_result.stderr}")
+                    except Exception as e:
+                        print(f"DEBUG: Dashboard build failed: {e}")
                         # Continue without dashboard build if it fails
                     
                     response_data = {
@@ -455,14 +459,16 @@ def analyze_channel():
                         print("DEBUG: Building React dashboard for CSV mode channel-only analysis...")
                         build_result = subprocess.run(
                             ['./build_dashboard.sh'], 
-                            check=True, 
                             capture_output=True, 
                             text=True,
                             cwd=os.path.dirname(os.path.abspath(__file__))
                         )
-                        print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
-                    except subprocess.CalledProcessError as e:
-                        print(f"DEBUG: Dashboard build failed: {e.stderr}")
+                        if build_result.returncode == 0:
+                            print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
+                        else:
+                            print(f"DEBUG: Dashboard build failed: {build_result.stderr}")
+                    except Exception as e:
+                        print(f"DEBUG: Dashboard build failed: {e}")
                         # Continue without dashboard build if it fails
                     
                     response_data = {
@@ -523,14 +529,16 @@ def analyze_channel():
                         print("DEBUG: Building React dashboard for CSV mode full analysis...")
                         build_result = subprocess.run(
                             ['./build_dashboard.sh'], 
-                            check=True, 
                             capture_output=True, 
                             text=True,
                             cwd=os.path.dirname(os.path.abspath(__file__))
                         )
-                        print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
-                    except subprocess.CalledProcessError as e:
-                        print(f"DEBUG: Dashboard build failed: {e.stderr}")
+                        if build_result.returncode == 0:
+                            print(f"DEBUG: Dashboard build completed: {build_result.stdout}")
+                        else:
+                            print(f"DEBUG: Dashboard build failed: {build_result.stderr}")
+                    except Exception as e:
+                        print(f"DEBUG: Dashboard build failed: {e}")
                         # Continue without dashboard build if it fails
                     
                     response_data = {
