@@ -18,7 +18,7 @@
         <h1>Tailor Your Shorts</h1>
         <p class="subtitle">
           An interactive dashboard to analyze YouTube Shorts performance and a
-          companion tool to help align your posts with subscriber growth spikes.
+          companion tool to help align your posts with metric growth spikes.
         </p>
         <canvas id="lineChart"></canvas>
       </div>
@@ -27,26 +27,26 @@
     <!-- CHANNEL ID SECTION -->
     <section class="page channel-id-section">
       <h2>Step 1: Find Your YouTube Channel ID</h2>
-      <div class="tutorial-video-block">
-        <div class="video-title">How to find your YouTube Channel ID</div>
-        <div class="video-embed">
-          <a
-            href="https://youtu.be/OU12l_jLAiw"
-            target="_blank"
-            class="video-link"
-          >
-            <div class="video-placeholder">
-              <span class="play-icon">▶️</span>
-              <span class="video-text">Watch Tutorial on YouTube</span>
-            </div>
-          </a>
-        </div>
-        <div class="video-caption">
-          Step 1: Locate your Channel ID for use in the analysis tool
-        </div>
-      </div>
 
       <div class="input-container">
+        <div class="tutorial-video-block">
+          <div class="video-embed">
+            <a
+              href="https://youtu.be/OU12l_jLAiw"
+              target="_blank"
+              class="video-link"
+            >
+              <div class="video-placeholder">
+                <span class="play-icon">▶️</span>
+                <span class="video-text">Watch Tutorial on YouTube</span>
+              </div>
+            </a>
+          </div>
+          <div class="video-caption">
+            Step 1: Locate your Channel ID for use in the analysis tool
+          </div>
+        </div>
+
         <div class="input-panel">
           <div class="input-group">
             <label for="channel-id">YouTube Channel ID</label>
@@ -66,19 +66,9 @@
             <span class="btn-loading" style="display: none">Processing...</span>
           </button>
         </div>
-
-        <div class="info-panel">
-          <h3>What you'll get:</h3>
-          <ul>
-            <li>📊 Subscriber growth timeline</li>
-            <li>🎯 Shorts performance analysis</li>
-            <li>📈 Peak detection and attribution</li>
-            <li>🎨 Visual insights and patterns</li>
-          </ul>
-        </div>
       </div>
 
-      <div class="analysis-progress" style="display: none">
+      <div class="analysis-progress">
         <div class="progress-steps">
           <div class="step active" data-step="1">
             <div class="step-number">1</div>
@@ -163,33 +153,27 @@
       <div id="csv-lock-overlay">
         Please complete the channel analysis above to unlock this section.
       </div>
-      <h2>Step 2: Upload Your Subscriber Data</h2>
-      <div class="tutorial-video-block">
-        <div class="video-title">Download your subscriber CSV</div>
-        <div class="video-embed">
-          <a
-            href="https://youtu.be/tQ25fbQZ90M"
-            target="_blank"
-            class="video-link"
-          >
-            <div class="video-placeholder">
-              <span class="play-icon">▶️</span>
-              <span class="video-text">Watch Tutorial on YouTube</span>
-            </div>
-          </a>
-        </div>
-        <div class="video-caption">
-          Step 2: Export your subscriber data from YouTube Analytics
-        </div>
-      </div>
-
-      <div class="tutorial-note">
-        <span aria-label="tip" role="img" style="font-size: 1.5em">💡</span>
-        Tip: When exporting your subscriber data, choose a time frame of at
-        least 30 days that includes dates when you posted Shorts.
-      </div>
+      <h2>Step 2: Upload Your Metric Data</h2>
 
       <div class="input-container">
+        <div class="tutorial-video-block">
+          <div class="video-embed">
+            <a
+              href="https://youtu.be/tQ25fbQZ90M"
+              target="_blank"
+              class="video-link"
+            >
+              <div class="video-placeholder">
+                <span class="play-icon">▶️</span>
+                <span class="video-text">Watch Tutorial on YouTube</span>
+              </div>
+            </a>
+          </div>
+          <div class="video-caption">
+            Step 2: Export your metric data from YouTube Analytics
+          </div>
+        </div>
+
         <div class="input-panel">
           <div class="input-group">
             <label for="analytics-csv">Analytics CSV File</label>
@@ -209,16 +193,17 @@
             <span class="btn-loading" style="display: none">Processing...</span>
           </button>
         </div>
+      </div>
 
-        <div class="info-panel">
-          <h3>What this unlocks:</h3>
-          <ul>
-            <li>📈 Subscriber spike detection</li>
-            <li>🎯 Shorts attribution analysis</li>
-            <li>📊 Peak-to-video mapping</li>
-            <li>🔍 Detailed correlation insights</li>
-          </ul>
-        </div>
+      <div class="tutorial-note">
+        <span aria-label="tip" role="img" style="font-size: 1.5em">💡</span>
+        Tip: When exporting your metric data, choose a time frame of at least 30
+        days that includes dates when you posted Shorts.
+      </div>
+
+      <!-- Reserved space for CSV success message to prevent layout shift -->
+      <div class="csv-dynamic-content-reserved-space">
+        <div class="csv-success-placeholder"></div>
       </div>
     </section>
 
@@ -228,11 +213,10 @@
         Please complete both the channel analysis and CSV upload above to unlock
         this section.
       </div>
-      <h2>Shorts & Subscriber Spikes</h2>
+      <h2>Shorts & Metric Spikes</h2>
       <p class="chart-subtext">
-        Hover over the line for subscriber counts by day<br />
-        Circle markers include recent Shorts information for that subscriber
-        spike
+        Hover over the line for metric counts by day<br />
+        Circle markers include recent Shorts information for that metric spike
       </p>
 
       <!-- Time‐series SVG -->
@@ -364,9 +348,9 @@
       <div class="csv-success">
         <h3 class="success-title">✓ CSV Upload Successful</h3>
         <p class="success-message">
-          Found <span id="peaks-count">0</span> subscriber peaks and
+          Found <span id="peaks-count">0</span> metric peaks and
           <span id="attributions-count">0</span> attributions. The Shorts &
-          Subscriber Spikes chart is now unlocked!
+          Metric Spikes chart is now unlocked!
         </p>
       </div>
     </template>

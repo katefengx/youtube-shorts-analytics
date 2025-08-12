@@ -152,6 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.removeItem("analysisComplete");
     localStorage.removeItem("csvUploadComplete");
     localStorage.removeItem("cachedApiData");
+    localStorage.removeItem("cachedCsvData");
     console.log("Cleared all saved data");
 
     // Reset UI state
@@ -183,6 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Restore analysis state from localStorage (after overlays are defined)
   const savedAnalysisState = localStorage.getItem("analysisComplete");
   const cachedApiData = localStorage.getItem("cachedApiData");
+  const cachedCsvData = localStorage.getItem("cachedCsvData");
 
   if (savedAnalysisState === "true" && savedChannelId && cachedApiData) {
     channelAnalysisComplete = true;
@@ -191,34 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       const parsedData = JSON.parse(cachedApiData);
 
-      // Display the cached results
-      const summary = parsedData.data.summary;
-
-      // Clone the template
-      const template = document.getElementById("cached-results-template");
-      const resultsDiv = template.content.cloneNode(true);
-
-      // Update the values
-      resultsDiv.querySelector("#cached-total-shorts").textContent =
-        summary.total_shorts;
-      resultsDiv.querySelector("#cached-total-views").textContent =
-        summary.total_views.toLocaleString();
-      resultsDiv.querySelector("#cached-avg-views").textContent = Math.round(
-        summary.avg_views_per_short,
-      ).toLocaleString();
-      resultsDiv.querySelector("#cached-date-range").textContent =
-        `${new Date(summary.date_range.start).toLocaleDateString()} - ${new Date(summary.date_range.end).toLocaleDateString()}`;
-
-      // Insert results after the progress section
-      const progressSection = document.getElementById("progress-section");
-      if (progressSection) {
-        progressSection.parentNode.insertBefore(
-          resultsDiv,
-          progressSection.nextSibling,
-        );
-      }
-
-      // Unlock sections based on saved state
+      // Unlock sections based on saved state (no cached results display)
 
       if (dashboardOverlay) {
         dashboardOverlay.style.display = "none";
@@ -239,10 +214,83 @@ document.addEventListener("DOMContentLoaded", function () {
           window.loadDashboard();
         }
       }, 100);
+
+      // Restore CSV data and analytics if available
+      if (csvUploadComplete && cachedCsvData) {
+        try {
+          const parsedCsvData = JSON.parse(cachedCsvData);
+
+          // Display CSV success message
+          const template = document.getElementById("csv-success-template");
+          const successDiv = template.content.cloneNode(true);
+          successDiv.querySelector("#peaks-count").textContent =
+            parsedCsvData.sub_peaks.length;
+          successDiv.querySelector("#attributions-count").textContent =
+            parsedCsvData.attributions.length;
+
+          const csvReservedSpace = document.querySelector(
+            ".csv-dynamic-content-reserved-space",
+          );
+          const csvPlaceholder = csvReservedSpace.querySelector(
+            ".csv-success-placeholder",
+          );
+          if (csvPlaceholder) {
+            csvPlaceholder.innerHTML = "";
+            csvPlaceholder.appendChild(successDiv);
+          }
+
+          // Restore analytics chart with cached data
+          // Handle flexible column names - use first column for date, second for metric
+          const subsData = parsedCsvData.sub_stats.map((d) => {
+            const keys = Object.keys(d);
+            const dateKey = keys[0]; // First column
+            const metricKey = keys[1]; // Second column
+            return {
+              Date: d[dateKey] ? new Date(d[dateKey]) : undefined,
+              Subscribers: +d[metricKey] || 0,
+            };
+          });
+          const cleanSubs = subsData.filter((d) => d.Subscribers >= 0);
+
+          const shortsByDay = parsedCsvData.shorts_by_day.map((d) => ({
+            date: parseDate(d.date),
+            avg_views: +d.avg_views,
+            count_shorts: +d.count_shorts,
+            thumbnail_urls: d.thumbnail_urls,
+          }));
+
+          const subPeaks = parsedCsvData.sub_peaks.map((d) => ({
+            date: new Date(d.date),
+            value: +d.value,
+          }));
+
+          const attributions = parsedCsvData.attributions.map((d) => ({
+            peak_date: new Date(d.peak_date),
+            candidate_video_id: d.candidate_video_id,
+            title: d.title,
+            views: +d.views,
+            narrative: d.narrative,
+          }));
+
+          drawSubsTimeSeriesResponsive(
+            cleanSubs, // main line (subscriber gains)
+            shortsByDay, // daily blocks
+            subPeaks, // peaks
+            attributions, // attributions
+          );
+        } catch (e) {
+          console.error("Error parsing cached CSV data:", e);
+          // Clear invalid cached CSV data
+          localStorage.removeItem("cachedCsvData");
+          localStorage.removeItem("csvUploadComplete");
+          csvUploadComplete = false;
+        }
+      }
     } catch (e) {
       console.error("Error parsing cached API data:", e);
       // Clear invalid cached data and reset state
       localStorage.removeItem("cachedApiData");
+      localStorage.removeItem("cachedCsvData");
       localStorage.removeItem("analysisComplete");
       localStorage.removeItem("csvUploadComplete");
       channelAnalysisComplete = false;
@@ -258,6 +306,7 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.removeItem("analysisComplete");
     localStorage.removeItem("csvUploadComplete");
     localStorage.removeItem("cachedApiData");
+    localStorage.removeItem("cachedCsvData");
     channelAnalysisComplete = false;
     csvUploadComplete = false;
   }
@@ -391,7 +440,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Show progress and disable button
-    progressSection.style.display = "block";
+    progressSection.classList.add("visible");
     setStep(0);
     statusText.textContent = "Fetching videos from YouTube...";
     analyzeBtn.disabled = true;
@@ -448,12 +497,6 @@ document.addEventListener("DOMContentLoaded", function () {
         resultsDiv.querySelector("#date-range").textContent =
           `${new Date(summary.date_range.start).toLocaleDateString()} - ${new Date(summary.date_range.end).toLocaleDateString()}`;
 
-        // Insert results after the progress section
-        progressSection.parentNode.insertBefore(
-          resultsDiv,
-          progressSection.nextSibling,
-        );
-
         analyzeBtn.disabled = false;
         channelAnalysisComplete = true;
 
@@ -496,7 +539,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Error:", error);
         showError(error.message || "An error occurred during analysis");
         analyzeBtn.disabled = false;
-        progressSection.style.display = "none";
+        progressSection.classList.remove("visible");
       });
   });
 
@@ -595,16 +638,26 @@ document.addEventListener("DOMContentLoaded", function () {
         successDiv.querySelector("#attributions-count").textContent =
           data.attributions.length;
 
-        // Insert success message after the CSV upload form
-        uploadCsvBtn.parentNode.parentNode.appendChild(successDiv);
+        // Insert success message into the CSV reserved space
+        const csvReservedSpace = document.querySelector(
+          ".csv-dynamic-content-reserved-space",
+        );
+        const csvPlaceholder = csvReservedSpace.querySelector(
+          ".csv-success-placeholder",
+        );
+        if (csvPlaceholder) {
+          csvPlaceholder.innerHTML = "";
+          csvPlaceholder.appendChild(successDiv);
+        }
 
         uploadCsvBtn.disabled = false;
         btnText.style.display = "inline";
         btnLoading.style.display = "none";
         csvUploadComplete = true;
 
-        // Save CSV upload state to localStorage
+        // Save CSV upload state and data to localStorage for persistence
         localStorage.setItem("csvUploadComplete", "true");
+        localStorage.setItem("cachedCsvData", JSON.stringify(data));
 
         // UNLOCK analytics section
         if (analyticsOverlay) {
@@ -616,10 +669,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // --- Use backend data for chart ---
-        const subsData = data.sub_stats.map((d) => ({
-          Date: d.Date ? new Date(d.Date) : undefined,
-          Subscribers: +d["Subscribers"] || 0,
-        }));
+        // Handle flexible column names - use first column for date, second for metric
+        const subsData = data.sub_stats.map((d) => {
+          const keys = Object.keys(d);
+          const dateKey = keys[0]; // First column
+          const metricKey = keys[1]; // Second column
+          return {
+            Date: d[dateKey] ? new Date(d[dateKey]) : undefined,
+            Subscribers: +d[metricKey] || 0,
+          };
+        });
         const cleanSubs = subsData.filter((d) => d.Subscribers >= 0);
 
         const shortsByDay = data.shorts_by_day.map((d) => ({

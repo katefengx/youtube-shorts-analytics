@@ -80,14 +80,14 @@ body::-webkit-scrollbar {
   min-height: 100vh;
   position: relative;
   z-index: 1;
-  padding: 2rem 0;
+  padding: 1rem 0;
 }
 
 .channel-id-section h2 {
   font-size: 2.5rem;
   font-weight: 700;
   color: #555;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
@@ -452,13 +452,10 @@ body::-webkit-scrollbar {
   position: absolute;
   pointer-events: none;
   background: #fff;
-  border: 1.5px solid #e29191;
   padding: 12px 16px;
-  border-radius: 8px;
   font-size: 1rem;
   color: #444;
   opacity: 0;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   transition: opacity 0.1s;
   z-index: 10;
 }
@@ -577,10 +574,46 @@ body::-webkit-scrollbar {
   justify-content: center;
   align-items: flex-start;
   gap: 60px;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
-  max-width: 1200px;
   width: 100%;
+  padding: 1rem;
+}
+
+/* Special styling for channel-id-section to align video and input side by side */
+.channel-id-section .input-container {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 80px;
+}
+
+.channel-id-section .tutorial-video-block {
+  flex: 0 0 auto;
+  max-width: 480px;
+  min-width: 400px;
+}
+
+.channel-id-section .input-panel {
+  flex: 0 0 auto;
+  min-width: 400px;
+}
+
+/* Special styling for csv-upload-section to align video and input side by side */
+.csv-upload-section .input-container {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 80px;
+}
+
+.csv-upload-section .tutorial-video-block {
+  flex: 0 0 auto;
+  max-width: 480px;
+  min-width: 400px;
+}
+
+.csv-upload-section .input-panel {
+  flex: 0 0 auto;
+  min-width: 400px;
 }
 .input-panel {
   display: flex;
@@ -636,7 +669,7 @@ body::-webkit-scrollbar {
 }
 .analyze-button {
   width: 100%;
-  padding: 14px 24px;
+  padding: 1rem 1rem;
   font-size: 1.1rem;
   font-weight: 500;
   color: #fff;
@@ -645,7 +678,6 @@ body::-webkit-scrollbar {
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  margin-top: 16px;
 }
 .analyze-button:hover {
   background: #d17a7a;
@@ -681,20 +713,34 @@ body::-webkit-scrollbar {
   gap: 8px;
 }
 .analysis-progress {
-  margin-top: 40px;
+  margin-top: 20px;
   width: 100%;
-  max-width: 600px;
+  max-width: 80%;
+  min-height: 2rem; /* No reserved space when hidden */
+  height: 0; /* Collapse when hidden */
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
 }
+
+.analysis-progress.visible {
+  visibility: visible;
+  opacity: 1;
+  min-height: 120px; /* Restore height when visible */
+  height: auto; /* Auto height when visible */
+}
+
 .progress-steps {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 .step {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   opacity: 0.4;
   transition: opacity 0.3s;
 }
@@ -705,8 +751,8 @@ body::-webkit-scrollbar {
   opacity: 0.8;
 }
 .step-number {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: #e29191;
   color: #fff;
@@ -714,24 +760,24 @@ body::-webkit-scrollbar {
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 .step.completed .step-number {
   background: #4caf50;
 }
 .step-text {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #666;
   text-align: center;
   font-weight: 500;
 }
 .progress-bar-analysis {
   width: 100%;
-  height: 8px;
+  height: 6px;
   background-color: #eee;
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 .progress-fill-analysis {
   width: 0;
@@ -742,7 +788,7 @@ body::-webkit-scrollbar {
 .analysis-status {
   text-align: center;
   color: #666;
-  font-size: 1rem;
+  font-size: 0.9rem;
   margin: 0;
 }
 
@@ -774,17 +820,10 @@ body::-webkit-scrollbar {
   margin: 0 0;
 }
 
-.video-title {
-  font-weight: 700;
-  font-size: 1.18rem;
-  margin-bottom: 12px;
-  text-align: center;
-  color: #d16a6a;
-}
-
 .video-caption {
   text-align: center;
-  margin-top: 12px;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
   color: #555;
   font-size: 1rem;
   font-style: italic;
@@ -807,7 +846,7 @@ body::-webkit-scrollbar {
   border: 2.5px solid #e29191;
   padding: 48px 56px 36px 56px;
   max-width: 1500px;
-  margin: 36px auto 0 auto;
+  margin: 16px auto 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -898,6 +937,44 @@ body::-webkit-scrollbar {
     font-size: 1.05rem;
     padding: 14px 6vw;
     max-width: 98vw;
+  }
+
+  /* Responsive styling for channel-id-section */
+  .channel-id-section .input-container {
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .channel-id-section .tutorial-video-block {
+    max-width: 95vw;
+    min-width: auto;
+  }
+
+  .channel-id-section .input-panel {
+    min-width: auto;
+    width: 100%;
+    max-width: 95vw;
+  }
+
+  /* Responsive styling for csv-upload-section */
+  .csv-upload-section .input-container {
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .csv-upload-section .tutorial-video-block {
+    max-width: 95vw;
+    min-width: auto;
+  }
+
+  .csv-upload-section .input-panel {
+    min-width: auto;
+    width: 100%;
+    max-width: 95vw;
   }
 }
 
