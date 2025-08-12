@@ -907,7 +907,7 @@ function drawSubsTimeSeriesResponsive(
         .html(
           `<div class="tooltip-content">
             <strong>${d3.utcFormat("%m/%d/%Y")(closestData.Date)}</strong><br/>
-            Subscribers gained: ${d3.format(",")(closestData.Subscribers)}
+            Gains: ${d3.format(",")(closestData.Subscribers)}
           </div>`,
         )
         .style("left", `${event.pageX + 12}px`)
