@@ -241,10 +241,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
           // Restore analytics chart with cached data
           // Handle flexible column names - use first column for date, second for metric
+          if (
+            !parsedCsvData.sub_stats ||
+            parsedCsvData.sub_stats.length === 0
+          ) {
+            throw new Error("No subscriber stats data available");
+          }
+          const keys = Object.keys(parsedCsvData.sub_stats[0]);
+          if (keys.length < 2) {
+            throw new Error(
+              "CSV must have at least 2 columns (date and metric)",
+            );
+          }
+          const dateKey = keys[0]; // First column
+          const metricKey = keys[1]; // Second column
+
+          console.log("DEBUG: CSV column keys:", keys);
+          console.log(
+            "DEBUG: Using dateKey:",
+            dateKey,
+            "metricKey:",
+            metricKey,
+          );
+
           const subsData = parsedCsvData.sub_stats.map((d) => {
-            const keys = Object.keys(d);
-            const dateKey = keys[0]; // First column
-            const metricKey = keys[1]; // Second column
             return {
               Date: d[dateKey] ? new Date(d[dateKey]) : undefined,
               Subscribers: +d[metricKey] || 0,
@@ -277,6 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
             shortsByDay, // daily blocks
             subPeaks, // peaks
             attributions, // attributions
+            metricKey, // metric column name
           );
         } catch (e) {
           console.error("Error parsing cached CSV data:", e);
@@ -670,10 +691,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // --- Use backend data for chart ---
         // Handle flexible column names - use first column for date, second for metric
+        if (!data.sub_stats || data.sub_stats.length === 0) {
+          throw new Error("No subscriber stats data available");
+        }
+        const keys = Object.keys(data.sub_stats[0]);
+        if (keys.length < 2) {
+          throw new Error("CSV must have at least 2 columns (date and metric)");
+        }
+        const dateKey = keys[0]; // First column
+        const metricKey = keys[1]; // Second column
+
+        console.log("DEBUG: CSV column keys:", keys);
+        console.log("DEBUG: Using dateKey:", dateKey, "metricKey:", metricKey);
+
         const subsData = data.sub_stats.map((d) => {
-          const keys = Object.keys(d);
-          const dateKey = keys[0]; // First column
-          const metricKey = keys[1]; // Second column
           return {
             Date: d[dateKey] ? new Date(d[dateKey]) : undefined,
             Subscribers: +d[metricKey] || 0,
@@ -706,6 +737,7 @@ document.addEventListener("DOMContentLoaded", function () {
           shortsByDay, // daily blocks
           subPeaks, // peaks
           attributions, // attributions
+          metricKey, // metric column name
         );
 
         // Scroll to analytics section
@@ -755,7 +787,43 @@ function drawSubsTimeSeriesResponsive(
   dailyData,
   peakData,
   attributionData,
+  metricName = "subscriber gains",
 ) {
+  // Convert column name to readable metric name
+  const getReadableMetricName = (columnName) => {
+    if (!columnName) return "subscriber gains";
+
+    // Convert common column names to readable format
+    const metricMap = {
+      subscribers: "subscriber gains",
+      subscriber_gains: "subscriber gains",
+      subscriber_growth: "subscriber growth",
+      views: "views",
+      view_count: "views",
+      likes: "likes",
+      like_count: "likes",
+      comments: "comments",
+      comment_count: "comments",
+      shares: "shares",
+      share_count: "shares",
+      engagement: "engagement",
+      engagement_rate: "engagement rate",
+      revenue: "revenue",
+      earnings: "earnings",
+      impressions: "impressions",
+      reach: "reach",
+      clicks: "clicks",
+      ctr: "click-through rate",
+    };
+
+    const lowerColumn = columnName.toLowerCase().replace(/[^a-z0-9]/g, "_");
+    return (
+      metricMap[lowerColumn] ||
+      columnName.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+    );
+  };
+
+  const readableMetricName = getReadableMetricName(metricName);
   const container = document.getElementById("time-series").parentNode;
   const width = container.offsetWidth;
   const height = width / 2; // 2:1 aspect ratio
@@ -907,7 +975,7 @@ function drawSubsTimeSeriesResponsive(
         .html(
           `<div class="tooltip-content">
             <strong>${d3.utcFormat("%m/%d/%Y")(closestData.Date)}</strong><br/>
-            Gains: ${d3.format(",")(closestData.Subscribers)}
+            ${readableMetricName}: ${d3.format(",")(closestData.Subscribers)}
           </div>`,
         )
         .style("left", `${event.pageX + 12}px`)
@@ -988,7 +1056,13 @@ function drawSubsTimeSeriesResponsive(
   let isMarkerHovered = false;
   let isThumbHovered = false;
 
-  function showThumbnails(px, py, attribs, peak) {
+  function showThumbnails(
+    px,
+    py,
+    attribs,
+    peak,
+    metricName = "subscriber gains",
+  ) {
     removeThumbnailGroup();
     const totalWidth = attribs.length * thumbW + (attribs.length - 1) * spacing;
     // Chart area bounds
@@ -1027,7 +1101,7 @@ function drawSubsTimeSeriesResponsive(
       .html(
         `<div class="thumbnail-tooltip-group">
           <div class="thumbnail-summary">
-            On ${d3.timeFormat("%B %-d, %Y")(peak.date)}, subscriber gains spiked to ${d3.format(",")(peak.value)}.<br>
+            On ${d3.timeFormat("%B %-d, %Y")(peak.date)}, ${metricName} spiked to ${d3.format(",")(peak.value)}.<br>
             Here are the videos that performed well and were posted before then:
           </div>
           <div style='display:flex;gap:${spacing}px;'>
@@ -1073,7 +1147,7 @@ function drawSubsTimeSeriesResponsive(
       if (!attribs) return;
       const px = x(d.date),
         py = y(d.value);
-      showThumbnails(px, py, attribs, d); // pass peak info
+      showThumbnails(px, py, attribs, d, readableMetricName); // pass peak info and metric name
     })
     .on("mouseleave", function () {
       isMarkerHovered = false;
@@ -1082,9 +1156,7 @@ function drawSubsTimeSeriesResponsive(
       }, 100);
     })
     .append("title")
-    .text(
-      (d) => `Peak: ${d3.timeFormat("%Y-%m-%d")(d.date)} (${d.value} subs)`,
-    );
+    .text((d) => `Peak: ${d3.timeFormat("%Y-%m-%d")(d.date)} (${d.value})`);
 
   let scrollVelocity = 0;
   let isScrolling = false;
