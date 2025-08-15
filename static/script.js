@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
               Subscribers: +d[metricKey] || 0,
             };
           });
-          const cleanSubs = subsData.filter((d) => d.Subscribers >= 0);
+          const cleanSubs = subsData; // Include all values, including negative ones
 
           const shortsByDay = parsedCsvData.shorts_by_day.map((d) => ({
             date: parseDate(d.date),
@@ -710,7 +710,7 @@ document.addEventListener("DOMContentLoaded", function () {
             Subscribers: +d[metricKey] || 0,
           };
         });
-        const cleanSubs = subsData.filter((d) => d.Subscribers >= 0);
+        const cleanSubs = subsData; // Include all values, including negative ones
 
         const shortsByDay = data.shorts_by_day.map((d) => ({
           date: parseDate(d.date),
@@ -860,12 +860,14 @@ function drawSubsTimeSeriesResponsive(
     .domain([startDate, endDate])
     .range([margin.left, width - margin.right]);
 
+  const yMin = d3.min(subsData, (d) => d.Subscribers);
+  const yMax = d3.max(subsData, (d) => d.Subscribers);
+
   const y = d3
     .scaleLinear()
     .domain([
-      0,
-      d3.max(subsData, (d) => d.Subscribers) +
-        0.5 * d3.max(subsData, (d) => d.Subscribers),
+      yMin < 0 ? yMin - 10 : 0, // Only go below 0 if data has negative values
+      yMax + 0.1 * yMax,
     ])
     .nice()
     .range([height - margin.bottom, margin.top]);
