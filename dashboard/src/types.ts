@@ -51,11 +51,36 @@ export interface DashboardData {
   sentiment_stats: {
     [key: string]: number;
   };
-  posting_schedule: {
+  videos_per_day: {
     [key: string]: number;
   };
-  avg_views_per_day?: {
+  time_success_data: {
     [key: string]: number;
+  };
+  time_buckets: {
+    [key: string]: number;
+  };
+  heat_map_data: {
+    videos_posted: {
+      [hour: number]: {
+        [day: string]: number;
+      };
+    };
+    views: {
+      [hour: number]: {
+        [day: string]: number;
+      };
+    };
+    likes: {
+      [hour: number]: {
+        [day: string]: number;
+      };
+    };
+    comments: {
+      [hour: number]: {
+        [day: string]: number;
+      };
+    };
   };
   top_shorts: Array<{
     title: string;

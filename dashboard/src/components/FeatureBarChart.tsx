@@ -25,9 +25,9 @@ const FeatureBarChart: React.FC<FeatureBarChartProps> = ({
         const containerWidth = containerRef.current.offsetWidth;
         const containerHeight = containerRef.current.offsetHeight;
 
-        // Use container size, but maintain reasonable minimums
-        const width = Math.max(containerWidth, 200);
-        const height = Math.max(containerHeight, 100);
+        // Use container size directly
+        const width = containerWidth;
+        const height = containerHeight;
 
         setDimensions({ width, height });
       }
@@ -62,9 +62,9 @@ const FeatureBarChart: React.FC<FeatureBarChartProps> = ({
         const containerWidth = containerRef.current.offsetWidth;
         const containerHeight = containerRef.current.offsetHeight;
 
-        // Use container size, but maintain reasonable minimums
-        const width = Math.max(containerWidth, 200);
-        const height = Math.max(containerHeight, 100);
+        // Use container size directly
+        const width = containerWidth;
+        const height = containerHeight;
 
         setDimensions({ width, height });
       }
@@ -82,9 +82,9 @@ const FeatureBarChart: React.FC<FeatureBarChartProps> = ({
         const containerWidth = containerRef.current.offsetWidth;
         const containerHeight = containerRef.current.offsetHeight;
 
-        // Use container size, but maintain reasonable minimums
-        const width = Math.max(containerWidth, 200);
-        const height = Math.max(containerHeight, 100);
+        // Use container size directly
+        const width = containerWidth;
+        const height = containerHeight;
 
         setDimensions({ width, height });
       }

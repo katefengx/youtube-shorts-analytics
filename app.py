@@ -420,6 +420,9 @@ def get_dashboard_data():
         # Get filter parameters from query string (support multiple filters)
         hashtag_filter = request.args.get('hashtag_filter')  # 'true', 'false', or None
         emoji_filter = request.args.get('emoji_filter')  # 'true', 'false', or None
+        sentiment_filter = request.args.get('sentiment_filter')  # 'positive', 'negative', 'neutral', or None
+        
+        print(f"DEBUG: Received filters - hashtag: {hashtag_filter}, emoji: {emoji_filter}, sentiment: {sentiment_filter}")
         
         # Filter data by date range if provided
         if start_date and end_date:
@@ -440,7 +443,13 @@ def get_dashboard_data():
             df = df[df['has_emojis'] == has_emojis]
             print(f"DEBUG: Filtered by emojis (has_emojis={has_emojis}), {len(df)} records remaining")
         
-
+        # Apply sentiment filter if provided
+        if sentiment_filter is not None:
+            print(f"DEBUG: Before sentiment filtering - unique sentiment values: {df['sentiment'].unique()}")
+            print(f"DEBUG: Looking for sentiment: '{sentiment_filter.lower()}'")
+            df = df[df['sentiment'] == sentiment_filter.lower()]
+            print(f"DEBUG: Filtered by sentiment ({sentiment_filter}), {len(df)} records remaining")
+            print(f"DEBUG: After filtering - unique sentiment values: {df['sentiment'].unique()}")
         
         # Calculate dashboard statistics
         total_shorts = len(df)
@@ -487,18 +496,71 @@ def get_dashboard_data():
         print(f"DEBUG: Top shorts after filtering: {len(top_shorts)} shorts")
         
         # Sentiment analysis
-        sentiment_stats = df['sentiment'].value_counts().to_dict()
+        if sentiment_filter is not None:
+            # If filtering by sentiment, only show that sentiment's count
+            sentiment_stats = {sentiment_filter.lower(): len(df)}
+        else:
+            # If no sentiment filter, show all sentiment counts
+            sentiment_stats = df['sentiment'].value_counts().to_dict()
         print(f"DEBUG: Sentiment stats after filtering: {sentiment_stats}")
         
 
         
-        # Posting schedule (day of week)
-        posting_schedule = df['day_of_week'].value_counts().to_dict()
-        print(f"DEBUG: posting_schedule data: {posting_schedule}")
+        # Videos posted per day of the week (horizontal bar chart)
+        videos_per_day = df['day_of_week'].value_counts().to_dict()
+        print(f"DEBUG: videos_per_day data: {videos_per_day}")
         
-        # Average views per day of the week (success metric)
-        avg_views_per_day = df.groupby('day_of_week')['view_count'].mean().replace([np.nan, np.inf, -np.inf], 0).to_dict()
-        print(f"DEBUG: avg_views_per_day data: {avg_views_per_day}")
+        # Time distribution analysis (success by posting time)
+        # Group by hour and calculate average views
+        time_success_data = df.groupby('hour')['view_count'].mean().replace([np.nan, np.inf, -np.inf], 0).to_dict()
+        print(f"DEBUG: time_success_data: {time_success_data}")
+        
+        # Create time buckets for better visualization
+        time_buckets = {
+            'Early Morning (6-9 AM)': df[(df['hour'] >= 6) & (df['hour'] < 9)]['view_count'].mean(),
+            'Morning (9-12 PM)': df[(df['hour'] >= 9) & (df['hour'] < 12)]['view_count'].mean(),
+            'Afternoon (12-3 PM)': df[(df['hour'] >= 12) & (df['hour'] < 15)]['view_count'].mean(),
+            'Late Afternoon (3-6 PM)': df[(df['hour'] >= 15) & (df['hour'] < 18)]['view_count'].mean(),
+            'Evening (6-9 PM)': df[(df['hour'] >= 18) & (df['hour'] < 21)]['view_count'].mean(),
+            'Night (9-12 AM)': df[(df['hour'] >= 21) | (df['hour'] < 6)]['view_count'].mean()
+        }
+        # Replace NaN values with 0
+        time_buckets = {k: v if not pd.isna(v) else 0 for k, v in time_buckets.items()}
+        print(f"DEBUG: time_buckets: {time_buckets}")
+        
+        # Create heat map data for different metrics (hour vs day of week) with median values
+        heat_map_data = {
+            'videos_posted': {},
+            'views': {},
+            'likes': {},
+            'comments': {}
+        }
+        day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        
+        for hour in range(24):
+            heat_map_data['videos_posted'][hour] = {}
+            heat_map_data['views'][hour] = {}
+            heat_map_data['likes'][hour] = {}
+            heat_map_data['comments'][hour] = {}
+            
+            for day in day_order:
+                day_hour_data = df[(df['day_of_week'] == day) & (df['hour'] == hour)]
+                if len(day_hour_data) > 0:
+                    # For videos posted, count the number of videos
+                    heat_map_data['videos_posted'][hour][day] = int(len(day_hour_data))
+                    
+                    # For other metrics, use total values (sum)
+                    # This shows the total volume of engagement at each time slot
+                    heat_map_data['views'][hour][day] = int(day_hour_data['view_count'].sum())
+                    heat_map_data['likes'][hour][day] = int(day_hour_data['like_count'].sum())
+                    heat_map_data['comments'][hour][day] = int(day_hour_data['comment_count'].sum())
+                else:
+                    heat_map_data['videos_posted'][hour][day] = 0
+                    heat_map_data['views'][hour][day] = 0
+                    heat_map_data['likes'][hour][day] = 0
+                    heat_map_data['comments'][hour][day] = 0
+        
+        print(f"DEBUG: heat_map_data created with {len(heat_map_data)} metrics")
         
         # Prepare scatter plot data (duration vs engagement rate)
         scatter_data = {
@@ -569,8 +631,10 @@ def get_dashboard_data():
                 'avg_views_without': round(avg_views_without_emojis, 1)
             },
             'sentiment_stats': sentiment_stats,
-            'posting_schedule': posting_schedule,
-            'avg_views_per_day': avg_views_per_day,
+            'videos_per_day': videos_per_day,
+            'time_success_data': time_success_data,
+            'time_buckets': time_buckets,
+            'heat_map_data': heat_map_data,
             'top_shorts': top_shorts,
             'scatter_data': scatter_data,
             'time_series_data': time_series_data

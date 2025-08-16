@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useCallback } from "react";
 import "./SentimentAnalysis.css";
 
 interface SentimentAnalysisProps {
   sentimentStats: {
     [key: string]: number;
   };
+  onSentimentFilter?: (sentiment: string | null) => void;
+  activeSentimentFilter?: string | null;
 }
 
 const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({
   sentimentStats,
+  onSentimentFilter,
+  activeSentimentFilter,
 }) => {
   // Calculate total for percentage calculations
   const total = Object.values(sentimentStats).reduce(
@@ -31,6 +35,31 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({
     sentimentStats[a[0]] > sentimentStats[b[0]] ? a : b,
   )[0];
 
+  // Optimized click handlers
+  const handlePositiveClick = useCallback(() => {
+    if (onSentimentFilter) {
+      const newSentiment =
+        activeSentimentFilter === "positive" ? null : "positive";
+      onSentimentFilter(newSentiment);
+    }
+  }, [onSentimentFilter, activeSentimentFilter]);
+
+  const handleNeutralClick = useCallback(() => {
+    if (onSentimentFilter) {
+      const newSentiment =
+        activeSentimentFilter === "neutral" ? null : "neutral";
+      onSentimentFilter(newSentiment);
+    }
+  }, [onSentimentFilter, activeSentimentFilter]);
+
+  const handleNegativeClick = useCallback(() => {
+    if (onSentimentFilter) {
+      const newSentiment =
+        activeSentimentFilter === "negative" ? null : "negative";
+      onSentimentFilter(newSentiment);
+    }
+  }, [onSentimentFilter, activeSentimentFilter]);
+
   return (
     <div className="sentiment-analysis">
       <div className="sentiment-header">
@@ -51,22 +80,25 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({
       <div className="sentiment-breakdown">
         <div className="sentiment-bar">
           <div
-            className="sentiment-segment positive"
+            className={`sentiment-segment positive ${activeSentimentFilter === "positive" ? "active" : ""}`}
             style={{ width: `${positivePercentage}%` }}
+            onClick={handlePositiveClick}
           >
             <span className="sentiment-label">Positive</span>
             <span className="sentiment-count">{positiveCount}</span>
           </div>
           <div
-            className="sentiment-segment neutral"
+            className={`sentiment-segment neutral ${activeSentimentFilter === "neutral" ? "active" : ""}`}
             style={{ width: `${neutralPercentage}%` }}
+            onClick={handleNeutralClick}
           >
             <span className="sentiment-label">Neutral</span>
             <span className="sentiment-count">{neutralCount}</span>
           </div>
           <div
-            className="sentiment-segment negative"
+            className={`sentiment-segment negative ${activeSentimentFilter === "negative" ? "active" : ""}`}
             style={{ width: `${negativePercentage}%` }}
+            onClick={handleNegativeClick}
           >
             <span className="sentiment-label">Negative</span>
             <span className="sentiment-count">{negativeCount}</span>

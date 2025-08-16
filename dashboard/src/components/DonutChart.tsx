@@ -10,7 +10,8 @@ type DonutChartProps = {
   description: string;
   color?: string;
   title: string;
-  onFilterChange?: (filter: { type: string; hasFeature: boolean }) => void;
+  onFilterChange?: (filter: { type: string; hasFeature?: boolean }) => void;
+  activeFilter?: boolean;
 };
 
 const DonutChart: React.FC<DonutChartProps> = ({
@@ -22,6 +23,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   color = "#E78383",
   title,
   onFilterChange,
+  activeFilter,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 150, height: 150 });
@@ -33,10 +35,10 @@ const DonutChart: React.FC<DonutChartProps> = ({
         const containerWidth = containerRef.current.offsetWidth;
         const containerHeight = containerRef.current.offsetHeight;
 
-        // Use container size, but maintain aspect ratio and reasonable minimums
+        // Use container size directly with maximum constraint
         const size = Math.min(containerWidth, containerHeight, 200);
-        const width = Math.max(size, 100);
-        const height = Math.max(size, 100);
+        const width = size;
+        const height = size;
 
         setDimensions({ width, height });
       }
@@ -108,7 +110,12 @@ const DonutChart: React.FC<DonutChartProps> = ({
           onClick={(entry) => {
             if (onFilterChange) {
               const hasFeature = entry.name === "use";
-              onFilterChange({ type: title, hasFeature });
+              // If clicking the same section that's already active, unfilter it
+              if (activeFilter === hasFeature) {
+                onFilterChange({ type: title, hasFeature: undefined });
+              } else {
+                onFilterChange({ type: title, hasFeature });
+              }
             }
           }}
         >

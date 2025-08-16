@@ -26,7 +26,7 @@
 .bar {
   width: 50%;
   border-radius: 4px 4px 0 0;
-  transition: height 0.3s ease;
+  transition: height 0.15s ease;
   position: relative;
   min-height: 20px;
 }

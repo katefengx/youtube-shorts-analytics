@@ -2,6 +2,9 @@
   background: transparent;
   padding: 0.5rem;
   box-shadow: none;
+  min-height: fit-content;
+  display: flex;
+  flex-direction: column;
 }
 
 .schedule-header h3 {
@@ -20,109 +23,50 @@
   font-weight: 400;
 }
 
-.schedule-summary {
-  margin-bottom: 1rem;
-}
-
-.most-active-day {
+.sort-controls {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  flex-shrink: 0;
 }
 
-.active-label {
+.sort-label {
   font-size: 0.875rem;
-  color: #666;
-}
-
-.active-value {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #333;
-}
-
-.schedule-chart {
-  margin-bottom: 1rem;
-}
-
-.chart-bars-horizontal {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  max-width: 250px;
-}
-
-.chart-row {
-  display: flex;
-  align-items: center;
-}
-
-.day-label-horizontal {
-  font-size: 0.75rem;
-  color: #333;
   font-weight: 500;
-  min-width: 60px;
-  text-align: left;
-}
-
-.bar-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  min-height: 1.5rem;
-}
-
-.chart-bar-horizontal {
-  height: 1.5rem;
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  min-width: 1.5rem;
-}
-
-.chart-bar-horizontal.most-active {
-  background-color: #e78383;
-}
-
-.bar-value {
-  font-size: 0.625rem;
-  font-weight: 600;
-  color: white;
-}
-
-.schedule-stats {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #f0f0f0;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-}
-
-.stat-value {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.25rem;
-}
-
-.stat-label {
-  font-size: 0.75rem;
   color: #666;
-  text-align: center;
-  line-height: 1.2;
+  text-align: right;
 }
+
+.sort-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.sort-button {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #d9d9d9;
+  color: #666;
+  font-size: 0.75rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.sort-button:hover {
+  background: #f8f8f8;
+  border-color: #d0d0d0;
+}
+
+.sort-button.active {
+  background: #ffa7a7;
+  color: #333;
+  border-color: #d0d0d0;
+}
+
+/* Removed unused chart and stats styles to prevent layout issues */
 
 /* Donut Chart Styles */
 .donut-chart-section {
@@ -184,4 +128,225 @@
   color: #333;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   white-space: nowrap;
+}
+
+/* Heat Map Styles */
+.heat-map-section {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+  flex: 1;
+  min-height: 0;
+}
+
+.heat-map-section:empty {
+  display: none;
+}
+
+.heat-map-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.heat-map-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  overflow-x: auto;
+}
+
+.heat-map-container:empty {
+  display: none;
+}
+
+.heat-map {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 0;
+}
+
+.day-labels {
+  display: flex;
+  margin-left: 60px; /* Space for hour labels */
+  gap: 2px;
+  justify-content: space-between;
+}
+
+.day-label {
+  width: 25px;
+  height: 25px;
+  font-size: 0.6rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+}
+
+.heat-map-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+}
+
+.heat-map-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.hour-label {
+  width: 60px;
+  font-size: 0.7rem;
+  color: #333;
+  font-weight: 500;
+  text-align: right;
+  padding-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.heat-map-cell {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #f0f0f0;
+  cursor: default;
+  transition: all 0.2s ease;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.heat-map-cell:hover {
+  border-color: #333;
+  transform: scale(1.05);
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.heat-map-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.7rem;
+  color: #666;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.legend-gradient {
+  display: flex;
+  gap: 2px;
+}
+
+.legend-cell {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #f0f0f0;
+}
+
+/* Responsive design for heat map */
+@media (max-width: 768px) {
+  .heat-map {
+    min-width: 0;
+  }
+
+  .day-label {
+    width: 20px;
+    height: 20px;
+    font-size: 0.5rem;
+  }
+
+  .heat-map-cell {
+    width: 20px;
+    height: 20px;
+  }
+
+  .hour-label {
+    width: 50px;
+    font-size: 0.6rem;
+    padding-right: 0.5rem;
+  }
+
+  .day-labels {
+    margin-left: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heat-map {
+    min-width: 0;
+  }
+
+  .day-label {
+    width: 18px;
+    height: 18px;
+    font-size: 0.45rem;
+  }
+
+  .heat-map-cell {
+    width: 18px;
+    height: 18px;
+  }
+
+  .hour-label {
+    width: 45px;
+    font-size: 0.55rem;
+    padding-right: 0.25rem;
+  }
+
+  .day-labels {
+    margin-left: 45px;
+  }
+
+  .heat-map-legend {
+    font-size: 0.6rem;
+    gap: 0.5rem;
+  }
+
+  .legend-cell {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .heat-map {
+    min-width: 0;
+  }
+
+  .day-label {
+    width: 30px;
+    height: 30px;
+    font-size: 0.7rem;
+  }
+
+  .heat-map-cell {
+    width: 30px;
+    height: 30px;
+  }
+
+  .hour-label {
+    width: 70px;
+    font-size: 0.8rem;
+    padding-right: 1rem;
+  }
+
+  .day-labels {
+    margin-left: 70px;
+  }
 }

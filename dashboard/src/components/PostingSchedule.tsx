@@ -2,17 +2,40 @@ import React, { useRef, useEffect, useState } from "react";
 import "./PostingSchedule.css";
 
 interface PostingScheduleProps {
-  postingSchedule: {
+  videosPerDay: {
     [key: string]: number;
   };
-  avgViewsPerDay?: {
+  timeBuckets: {
     [key: string]: number;
+  };
+  heatMapData?: {
+    videos_posted: {
+      [hour: number]: {
+        [day: string]: number;
+      };
+    };
+    views: {
+      [hour: number]: {
+        [day: string]: number;
+      };
+    };
+    likes: {
+      [hour: number]: {
+        [day: string]: number;
+      };
+    };
+    comments: {
+      [hour: number]: {
+        [day: string]: number;
+      };
+    };
   };
 }
 
 const PostingSchedule: React.FC<PostingScheduleProps> = ({
-  postingSchedule,
-  avgViewsPerDay,
+  videosPerDay,
+  timeBuckets,
+  heatMapData,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 300, height: 200 });
@@ -28,6 +51,10 @@ const PostingSchedule: React.FC<PostingScheduleProps> = ({
     data: null,
   });
 
+  const [selectedMetric, setSelectedMetric] = useState<
+    "videos_posted" | "views" | "likes" | "comments"
+  >("videos_posted");
+
   // Update dimensions when container size changes
   useEffect(() => {
     const updateDimensions = () => {
@@ -35,9 +62,9 @@ const PostingSchedule: React.FC<PostingScheduleProps> = ({
         const containerWidth = containerRef.current.offsetWidth;
         const containerHeight = containerRef.current.offsetHeight;
 
-        // Use container size, but maintain reasonable minimums
-        const width = Math.max(containerWidth, 200);
-        const height = Math.max(containerHeight, 100);
+        // Use container size directly
+        const width = containerWidth;
+        const height = containerHeight;
 
         setDimensions({ width, height });
       }
@@ -72,9 +99,9 @@ const PostingSchedule: React.FC<PostingScheduleProps> = ({
         const containerWidth = containerRef.current.offsetWidth;
         const containerHeight = containerRef.current.offsetHeight;
 
-        // Use container size, but maintain reasonable minimums
-        const width = Math.max(containerWidth, 200);
-        const height = Math.max(containerHeight, 100);
+        // Use container size directly
+        const width = containerWidth;
+        const height = containerHeight;
 
         setDimensions({ width, height });
       }
@@ -92,9 +119,9 @@ const PostingSchedule: React.FC<PostingScheduleProps> = ({
         const containerWidth = containerRef.current.offsetWidth;
         const containerHeight = containerRef.current.offsetHeight;
 
-        // Use container size, but maintain reasonable minimums
-        const width = Math.max(containerWidth, 200);
-        const height = Math.max(containerHeight, 100);
+        // Use container size directly
+        const width = containerWidth;
+        const height = containerHeight;
 
         setDimensions({ width, height });
       }
@@ -115,26 +142,6 @@ const PostingSchedule: React.FC<PostingScheduleProps> = ({
     "Sunday",
   ];
 
-  // Use average views per day data
-  const dataToUse = avgViewsPerDay || postingSchedule;
-
-  // Calculate total for percentage calculations
-  const total = Object.values(postingSchedule).reduce(
-    (sum, count) => sum + count,
-    0,
-  );
-
-  // Find the maximum value for scaling
-  const maxValue = Math.max(...Object.values(dataToUse), 1);
-
-  // Get the best performing day
-  const bestPerformingDay = Object.entries(dataToUse).reduce((a, b) =>
-    dataToUse[a[0]] > dataToUse[b[0]] ? a : b,
-  )[0];
-
-  // Use responsive width based on container
-  const maxWidth = Math.min(dimensions.width * 0.6, 180);
-
   const formatNumber = (value: number) => {
     if (value >= 1000000) {
       return `${(value / 1000000).toFixed(1)}M`;
@@ -145,182 +152,193 @@ const PostingSchedule: React.FC<PostingScheduleProps> = ({
     }
   };
 
-  // Calculate average videos per day
-  const avgVideosPerDay = total / 7;
-
-  // Prepare donut chart data
-  const donutData = dayOrder.map((day) => ({
-    day,
-    count: postingSchedule[day] || 0,
-    percentage: total > 0 ? ((postingSchedule[day] || 0) / total) * 100 : 0,
-  }));
-
-  // Donut chart colors - variations of #E78383
-  const colors = [
-    "#e78383", // Original
-    "#d47373", // Darker
-    "#f19393", // Lighter
-    "#c16363", // Even darker
-    "#f9a3a3", // Even lighter
-    "#b05353", // Very dark
-    "#ffb3b3", // Very light
-  ];
-
-  const handleDonutMouseMove = (event: React.MouseEvent, item: any) => {
-    if (item.count > 0) {
-      setTooltip({
-        show: true,
-        x: event.clientX,
-        y: event.clientY,
-        data: item,
-      });
-    }
-  };
-
-  const handleDonutMouseLeave = () => {
-    setTooltip({ show: false, x: 0, y: 0, data: null });
-  };
-
   return (
     <div className="posting-schedule" ref={containerRef}>
       <div className="schedule-header">
         <h3>POSTING SCHEDULE</h3>
         <p className="schedule-subtitle">
-          average views for videos posted on each day
+          success by posting time (
+          {Intl.DateTimeFormat().resolvedOptions().timeZone})
         </p>
       </div>
 
       <div className="schedule-summary">
-        <div className="most-active-day">
-          <span className="active-label">Best Day for Views:</span>
-          <span className="active-value">{bestPerformingDay}</span>
-        </div>
-      </div>
-
-      <div className="schedule-chart">
-        <div className="chart-bars-horizontal">
-          {dayOrder.map((day) => {
-            const value = dataToUse[day] || 0;
-            // Calculate width relative to the maximum value
-            const width = maxValue > 0 ? (value / maxValue) * maxWidth : 0;
-            const isBestPerforming = day === bestPerformingDay;
-
-            return (
-              <div key={day} className="chart-row">
-                <div className="day-label-horizontal">{day}</div>
-                <div className="bar-container">
-                  <div
-                    className={`chart-bar-horizontal ${isBestPerforming ? "most-active" : ""}`}
-                    style={{ width: `${width}px` }}
-                    title={`${day}: ${formatNumber(value)} avg views for videos posted on this day`}
-                  >
-                    {value > 0 && (
-                      <span className="bar-value">{formatNumber(value)}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="schedule-stats">
-        <div className="stat-item">
-          <span className="stat-value">{avgVideosPerDay.toFixed(1)}</span>
-          <span className="stat-label">Avg Videos/Day</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-value">
-            {dayOrder.filter((day) => (postingSchedule[day] || 0) > 0).length}
-          </span>
-          <span className="stat-label">Active Days</span>
-        </div>
-      </div>
-
-      {/* Donut Chart */}
-      <div className="donut-chart-section">
-        <h4 className="donut-title">Video Distribution by Day</h4>
-        <div className="donut-chart">
-          <svg width="120" height="120" viewBox="0 0 120 120">
-            <circle
-              cx="60"
-              cy="60"
-              r="50"
-              fill="none"
-              stroke="#f0f0f0"
-              strokeWidth="20"
-            />
-            {(() => {
-              let currentAngle = -90; // Start from top
-              return donutData.map((item, index) => {
-                if (item.count === 0) return null;
-                const angle = (item.percentage / 100) * 360;
-                const x1 = 60 + 50 * Math.cos((currentAngle * Math.PI) / 180);
-                const y1 = 60 + 50 * Math.sin((currentAngle * Math.PI) / 180);
-                const x2 =
-                  60 + 50 * Math.cos(((currentAngle + angle) * Math.PI) / 180);
-                const y2 =
-                  60 + 50 * Math.sin(((currentAngle + angle) * Math.PI) / 180);
-
-                const largeArcFlag = angle > 180 ? 1 : 0;
-                const pathData = [
-                  `M ${x1} ${y1}`,
-                  `A 50 50 0 ${largeArcFlag} 1 ${x2} ${y2}`,
-                ].join(" ");
-
-                currentAngle += angle;
-
-                return (
-                  <path
-                    key={item.day}
-                    d={pathData}
-                    fill="none"
-                    stroke={colors[index]}
-                    strokeWidth="20"
-                    strokeLinecap="butt"
-                    onMouseMove={(e) => handleDonutMouseMove(e, item)}
-                    onMouseLeave={handleDonutMouseLeave}
-                    style={{ cursor: "pointer" }}
-                  />
-                );
-              });
-            })()}
-          </svg>
-        </div>
-        <div className="donut-legend">
-          {donutData
-            .filter((item) => item.count > 0)
-            .map((item, index) => (
-              <div key={item.day} className="legend-item">
-                <div
-                  className="legend-color"
-                  style={{ backgroundColor: colors[index] }}
-                ></div>
-                <span className="legend-text">{item.day}</span>
-              </div>
-            ))}
-        </div>
-      </div>
-
-      {/* Tooltip */}
-      {tooltip.show && tooltip.data && (
-        <div
-          className="donut-tooltip"
-          style={{
-            position: "fixed",
-            left: tooltip.x + 10,
-            top: tooltip.y - 10,
-            zIndex: 1000,
-          }}
-        >
-          <div className="tooltip-content">
-            <strong>{tooltip.data.day}</strong>
-            <br />
-            {tooltip.data.count} videos ({tooltip.data.percentage.toFixed(1)}%)
+        <div className="sort-controls">
+          <div className="sort-buttons">
+            <button
+              className={`sort-button ${selectedMetric === "videos_posted" ? "active" : ""}`}
+              onClick={() => setSelectedMetric("videos_posted")}
+            >
+              VIDEOS
+            </button>
+            <button
+              className={`sort-button ${selectedMetric === "views" ? "active" : ""}`}
+              onClick={() => setSelectedMetric("views")}
+            >
+              VIEWS
+            </button>
+            <button
+              className={`sort-button ${selectedMetric === "likes" ? "active" : ""}`}
+              onClick={() => setSelectedMetric("likes")}
+            >
+              LIKES
+            </button>
+            <button
+              className={`sort-button ${selectedMetric === "comments" ? "active" : ""}`}
+              onClick={() => setSelectedMetric("comments")}
+            >
+              COMMENTS
+            </button>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Heat Map */}
+      {heatMapData &&
+        (() => {
+          // Check if there's any data to display
+          const hasAnyData = Array.from({ length: 24 }, (_, hour) =>
+            dayOrder.some(
+              (day) => (heatMapData?.videos_posted?.[hour]?.[day] || 0) > 0,
+            ),
+          ).some((hasVideos) => hasVideos);
+
+          // Don't render anything if there's no data
+          if (!hasAnyData) {
+            return null;
+          }
+
+          return (
+            <div className="heat-map-section">
+              <h4 className="heat-map-title">Success by Day & Time</h4>
+              <div className="heat-map-container">
+                <div className="heat-map">
+                  {/* Day labels (x-axis) */}
+                  <div className="day-labels">
+                    {dayOrder.map((day) => (
+                      <div key={day} className="day-label">
+                        {day.slice(0, 3)}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Heat map grid */}
+                  <div className="heat-map-grid">
+                    {Array.from({ length: 24 }, (_, hour) => {
+                      // Check if this hour has any videos posted across all days
+                      const hasAnyVideos = dayOrder.some(
+                        (day) =>
+                          (heatMapData?.videos_posted?.[hour]?.[day] || 0) > 0,
+                      );
+
+                      // Skip hours with no videos
+                      if (!hasAnyVideos) return null;
+
+                      return (
+                        <div key={hour} className="heat-map-row">
+                          <div className="hour-label">
+                            {(() => {
+                              // Convert UTC hour to local hour
+                              const utcDate = new Date(
+                                Date.UTC(2024, 0, 1, hour),
+                              );
+                              const localHour = utcDate.getHours();
+                              return new Date(
+                                2024,
+                                0,
+                                1,
+                                localHour,
+                              ).toLocaleTimeString("en-US", {
+                                hour: "numeric",
+                                hour12: true,
+                                timeZone:
+                                  Intl.DateTimeFormat().resolvedOptions()
+                                    .timeZone,
+                              });
+                            })()}
+                          </div>
+                          {dayOrder.map((day) => {
+                            const value =
+                              heatMapData?.[selectedMetric]?.[hour]?.[day] || 0;
+                            const maxValue = heatMapData?.[selectedMetric]
+                              ? Math.max(
+                                  ...Object.values(
+                                    heatMapData[selectedMetric],
+                                  ).flatMap((hourData) =>
+                                    Object.values(hourData),
+                                  ),
+                                )
+                              : 0;
+                            const intensity =
+                              maxValue > 0 ? Math.min(value / maxValue, 1) : 0;
+                            const backgroundColor = `rgba(231, 131, 131, ${intensity})`;
+
+                            const metricLabel =
+                              selectedMetric === "videos_posted"
+                                ? "videos"
+                                : selectedMetric === "views"
+                                  ? "total views"
+                                  : selectedMetric === "likes"
+                                    ? "total likes"
+                                    : "total comments";
+
+                            // For total values, we can show data even with 1 video
+                            const displayValue = formatNumber(value);
+                            const displayLabel = metricLabel;
+
+                            // Convert UTC hour to local hour
+                            const utcDate = new Date(
+                              Date.UTC(2024, 0, 1, hour),
+                            );
+                            const localHour = utcDate.getHours();
+                            const localTimeString = new Date(
+                              2024,
+                              0,
+                              1,
+                              localHour,
+                            ).toLocaleTimeString("en-US", {
+                              hour: "numeric",
+                              hour12: true,
+                              timeZone:
+                                Intl.DateTimeFormat().resolvedOptions()
+                                  .timeZone,
+                            });
+
+                            return (
+                              <div
+                                key={day}
+                                className="heat-map-cell"
+                                style={{ backgroundColor }}
+                                title={`${day} ${localTimeString}: ${displayValue} ${displayLabel}`}
+                              />
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="heat-map-legend">
+                  <span>Low</span>
+                  <div className="legend-gradient">
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <div
+                        key={i}
+                        className="legend-cell"
+                        style={{
+                          backgroundColor: `rgba(231, 131, 131, ${i / 9})`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <span>High</span>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
     </div>
   );
 };

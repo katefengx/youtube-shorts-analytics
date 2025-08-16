@@ -137,7 +137,9 @@ const TopPerformingShorts: React.FC<TopPerformingShortsProps> = ({
 
           return (
             <div key={index} className="short-item">
-              <div className="short-title">{short.title || "Untitled"}</div>
+              <div className="short-title" title={short.title || "Untitled"}>
+                {short.title || "Untitled"}
+              </div>
               <div className="short-bar-container">
                 <div
                   className="short-bar-fill"

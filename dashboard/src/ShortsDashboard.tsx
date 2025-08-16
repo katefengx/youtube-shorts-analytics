@@ -23,6 +23,7 @@ const ShortsDashboard: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<{
     hashtags?: boolean;
     emojis?: boolean;
+    sentiment?: string;
   }>({});
 
   // State for KPI card hover data
@@ -68,6 +69,9 @@ const ShortsDashboard: React.FC = () => {
     if (activeFilters.emojis !== undefined) {
       url += `&emoji_filter=${activeFilters.emojis}`;
     }
+    if (activeFilters.sentiment !== undefined) {
+      url += `&sentiment_filter=${activeFilters.sentiment}`;
+    }
 
     fetch(url)
       .then((res) => res.json())
@@ -87,7 +91,8 @@ const ShortsDashboard: React.FC = () => {
 
   const handleFilterChange = (filter: {
     type: string;
-    hasFeature: boolean;
+    hasFeature?: boolean;
+    sentiment?: string;
   }) => {
     // Update active filters
     const newFilters = { ...activeFilters };
@@ -95,35 +100,10 @@ const ShortsDashboard: React.FC = () => {
       newFilters.hashtags = filter.hasFeature;
     } else if (filter.type === "emojis") {
       newFilters.emojis = filter.hasFeature;
+    } else if (filter.type === "sentiment") {
+      newFilters.sentiment = filter.sentiment;
     }
     setActiveFilters(newFilters);
-  };
-
-  const resetFilters = () => {
-    setActiveFilters({});
-    setLoading(true);
-
-    // Make a new API call without filter parameters
-    const [startIdx, endIdx] = selectedRange;
-    const startDate = allDates[startIdx];
-    const endDate = allDates[endIdx];
-
-    const url = `${API_BASE_URL}/api/dashboard_data?start_date=${startDate}&end_date=${endDate}`;
-
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setDashboardData(data);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
   };
 
   // Use dashboardData directly since filtering is now handled server-side
@@ -288,10 +268,10 @@ const ShortsDashboard: React.FC = () => {
             hashtagData={filteredData.hashtag_stats}
             emojiData={filteredData.emoji_stats}
             activeFilters={{
-              hashtags: activeFilters.hashtags ?? false,
-              emojis: activeFilters.emojis ?? false,
+              hashtags: activeFilters.hashtags,
+              emojis: activeFilters.emojis,
+              sentiment: activeFilters.sentiment,
             }}
-            resetFilters={resetFilters}
             onFilterChange={handleFilterChange}
             filteredData={filteredData}
           />
@@ -323,14 +303,24 @@ const ShortsDashboard: React.FC = () => {
         <div className="right-column">
           {/* Sentiment Analysis Component */}
           <div className="sentiment-section">
-            <SentimentAnalysis sentimentStats={filteredData.sentiment_stats} />
+            <SentimentAnalysis
+              sentimentStats={filteredData.sentiment_stats}
+              onSentimentFilter={(sentiment) => {
+                handleFilterChange({
+                  type: "sentiment",
+                  sentiment: sentiment || undefined,
+                });
+              }}
+              activeSentimentFilter={activeFilters.sentiment || null}
+            />
           </div>
 
           {/* Posting Schedule Component */}
           <div className="posting-schedule-section">
             <PostingSchedule
-              postingSchedule={filteredData.posting_schedule}
-              avgViewsPerDay={filteredData.avg_views_per_day}
+              videosPerDay={filteredData.videos_per_day}
+              timeBuckets={filteredData.time_buckets}
+              heatMapData={filteredData.heat_map_data}
             />
           </div>
         </div>

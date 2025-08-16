@@ -3,11 +3,18 @@ import DonutChart from "./DonutChart";
 import "./DonutEngagement.css";
 
 interface DonutEngagementProps {
-  activeFilters: { hashtags: boolean; emojis: boolean };
-  resetFilters: () => void;
+  activeFilters: {
+    hashtags?: boolean;
+    emojis?: boolean;
+    sentiment?: string;
+  };
   hashtagData: any;
   emojiData: any;
-  onFilterChange: (filter: { type: string; hasFeature: boolean }) => void;
+  onFilterChange: (filter: {
+    type: string;
+    hasFeature?: boolean;
+    sentiment?: string;
+  }) => void;
   filteredData: {
     hashtag_stats: {
       avg_views_with: number;
@@ -22,7 +29,6 @@ interface DonutEngagementProps {
 
 const DonutEngagement: React.FC<DonutEngagementProps> = ({
   activeFilters,
-  resetFilters,
   hashtagData,
   emojiData,
   onFilterChange,
@@ -34,19 +40,9 @@ const DonutEngagement: React.FC<DonutEngagementProps> = ({
         <h3>FEATURE PERFORMANCE</h3>
         <p className="donut-chart_subtitle">hashtag and emoji usage analysis</p>
         <div className="donut-instruction">
-          Click on sections in the charts to filter the dashboard by hashtag and
-          emoji use.
+          Click on sections in the charts to filter the dashboard by hashtag,
+          emoji, and sentiment. Click again to unfilter.
         </div>
-        {(activeFilters.hashtags !== undefined ||
-          activeFilters.emojis !== undefined) && (
-          <button
-            className="reset-filters-btn"
-            onClick={resetFilters}
-            title="Reset all filters"
-          >
-            Reset Filters
-          </button>
-        )}
       </div>
 
       <div className="donut-charts-stacked">
@@ -58,6 +54,7 @@ const DonutEngagement: React.FC<DonutEngagementProps> = ({
           title="hashtags"
           description={`${hashtagData.avg_hashtags_per_video} hashtags per Shorts with hashtags`}
           onFilterChange={onFilterChange}
+          activeFilter={activeFilters.hashtags}
         />
         <DonutChart
           usage_percentage={emojiData.usage_percentage}
@@ -67,6 +64,7 @@ const DonutEngagement: React.FC<DonutEngagementProps> = ({
           title="emojis"
           description={`${emojiData.avg_emojis_per_video} emojis per Shorts with emojis`}
           onFilterChange={onFilterChange}
+          activeFilter={activeFilters.emojis}
         />
       </div>
       {/* Combined Bar Chart */}

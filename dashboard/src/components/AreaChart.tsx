@@ -36,8 +36,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
         const containerHeight = containerRef.current.offsetHeight;
 
         // Use prop dimensions if provided, otherwise use container size
-        const width = propWidth || Math.max(containerWidth, 100);
-        const height = propHeight || Math.max(containerHeight, 40);
+        const width = propWidth || containerWidth;
+        const height = propHeight || containerHeight;
 
         setDimensions({ width, height });
       }
