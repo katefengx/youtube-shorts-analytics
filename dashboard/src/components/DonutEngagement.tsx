@@ -70,9 +70,9 @@ const DonutEngagement: React.FC<DonutEngagementProps> = ({
       {/* Combined Bar Chart */}
       <div className="combined-bar-chart">
         <div className="bar-chart-header">
-          <h4>FEATURE PERFORMANCE</h4>
+          <h4>AVERAGE VIEW COMPARISON</h4>
           <p className="bar-chart-subtitle">
-            average views with and without features
+            avg. views with and without features
           </p>
         </div>
         <FeatureBarChart

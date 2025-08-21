@@ -16,7 +16,7 @@ const FeatureBarChart: React.FC<FeatureBarChartProps> = ({
   emojiData,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 300, height: 200 });
+  const [dimensions, setDimensions] = useState({ width: 300, height: 50 });
 
   // Update dimensions when container size changes
   useEffect(() => {
@@ -110,8 +110,8 @@ const FeatureBarChart: React.FC<FeatureBarChartProps> = ({
     emojiData.withoutFeature,
   );
 
-  // Use responsive height based on container
-  const maxHeight = Math.min(dimensions.height * 0.6, 200);
+  // Use more of the available container height for better space utilization
+  const maxHeight = dimensions.height * 0.8;
 
   return (
     <div className="bars-container" ref={containerRef}>

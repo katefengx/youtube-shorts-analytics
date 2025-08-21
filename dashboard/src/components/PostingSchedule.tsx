@@ -33,105 +33,15 @@ interface PostingScheduleProps {
 }
 
 const PostingSchedule: React.FC<PostingScheduleProps> = ({
-  videosPerDay: _videosPerDay, // Prefix with underscore to indicate unused
-  timeBuckets: _timeBuckets, // Prefix with underscore to indicate unused
+  videosPerDay: _videosPerDay,
+  timeBuckets: _timeBuckets,
   heatMapData,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  // Remove unused state variables
-  // const [dimensions, setDimensions] = useState({ width: 300, height: 200 });
-  // const [tooltip, setTooltip] = useState<{
-  //   show: boolean;
-  //   x: number;
-  //   y: number;
-  //   data: any;
-  // }>({
-  //   show: false,
-  //   x: 0,
-  //   y: 0,
-  //   data: null,
-  // });
 
   const [selectedMetric, setSelectedMetric] = useState<
     "videos_posted" | "views" | "likes" | "comments"
   >("videos_posted");
-
-  // Remove unused dimension tracking code
-  // useEffect(() => {
-  //   const updateDimensions = () => {
-  //     if (containerRef.current) {
-  //       const containerWidth = containerRef.current.offsetWidth;
-  //       const containerHeight = containerRef.current.offsetHeight;
-
-  //       // Use container size directly
-  //       const width = containerWidth;
-  //       const height = containerHeight;
-
-  //       setDimensions({ width, height });
-  //     }
-  //   };
-
-  //   // Initial dimensions calculation
-  //   updateDimensions();
-
-  //   // Add resize listener
-  //   const resizeObserver = new ResizeObserver(updateDimensions);
-  //   if (containerRef.current) {
-  //     resizeObserver.observe(containerRef.current);
-  //   }
-
-  //   // Also update on next tick to ensure dimensions are available
-  //   const timeoutId = setTimeout(updateDimensions, 0);
-
-  //   // Force update after a short delay to catch any CSS changes
-  //   const forceUpdateId = setTimeout(updateDimensions, 100);
-
-  //   return () => {
-  //     resizeObserver.disconnect();
-  //     clearTimeout(timeoutId);
-  //     clearTimeout(forceUpdateId);
-  //   };
-  // }, []);
-
-  // Remove unused dimension tracking code
-  // useEffect(() => {
-  //   const updateDimensions = () => {
-  //     if (containerRef.current) {
-  //       const containerWidth = containerRef.current.offsetWidth;
-  //       const containerHeight = containerRef.current.offsetHeight;
-
-  //       // Use container size directly
-  //       const width = containerWidth;
-  //       const height = containerHeight;
-
-  //       setDimensions({ width, height });
-  //     }
-  //   };
-
-  //   // Update dimensions after render
-  //   const timeoutId = setTimeout(updateDimensions, 0);
-  //   return () => clearTimeout(timeoutId);
-  // });
-
-  // Listen for window resize events
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     if (containerRef.current) {
-  //       if (containerRef.current) {
-  //         const containerWidth = containerRef.current.offsetWidth;
-  //         const containerHeight = containerRef.current.offsetHeight;
-
-  //         // Use container size directly
-  //         const width = containerWidth;
-  //         const height = containerHeight;
-
-  //         setDimensions({ width, height });
-  //       }
-  //     };
-
-  //     window.addEventListener("resize", handleResize);
-  //     return () => window.removeEventListener("resize", handleResize);
-  //   }, []);
 
   // Define the order of days
   const dayOrder = [

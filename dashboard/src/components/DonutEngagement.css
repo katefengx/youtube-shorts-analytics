@@ -48,17 +48,21 @@
 
 /* Bar Chart Header Styles */
 .combined-bar-chart {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
   border-top: 1px solid #f0f0f0;
 }
 
+.bar-chart-header {
+  margin-bottom: 0.5rem;
+}
+
 .bar-chart-header h4 {
+  margin: 1rem 0 0.25rem 0;
   font-size: 1rem;
   font-weight: 600;
   color: #333;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .bar-chart-subtitle {
